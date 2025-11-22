@@ -1,0 +1,394 @@
+/* ============================================================
+   🌌 COSMIC PLANS PAGE
+   Premium subscription plans with cosmic theme
+   ============================================================ */
+
+.plans-page {
+    min-height: calc(100vh - 100px);
+    padding: 100px 30px 50px;
+    background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%);
+    color: var(--cosmic-white);
+}
+
+.plans-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.plans-title {
+    font-size: 2.5rem;
+    text-align: center;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from {
+        filter: drop-shadow(0 0 10px rgba(0, 168, 255, 0.5));
+    }
+    to {
+        filter: drop-shadow(0 0 20px rgba(156, 39, 255, 0.8));
+    }
+}
+
+.plans-subtitle {
+    text-align: center;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 3rem;
+}
+
+.upgrade-message {
+    max-width: 600px;
+    margin: 0 auto 2rem;
+    padding: 16px 24px;
+    border-radius: 12px;
+    text-align: center;
+    font-size: 1rem;
+    backdrop-filter: blur(10px);
+    animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.upgrade-message.success {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+    color: #81c784;
+}
+
+.upgrade-message.error {
+    background: rgba(244, 67, 54, 0.2);
+    border: 1px solid rgba(244, 67, 54, 0.5);
+    color: #ef5350;
+}
+
+.plans-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 2rem;
+    margin-top: 2rem;
+}
+
+/* ============================================================
+   📦 PLAN CARD
+   ============================================================ */
+
+.plan-card {
+    position: relative;
+    background: rgba(15, 12, 26, 0.6);
+    border: 2px solid rgba(156, 39, 255, 0.25);
+    border-radius: 20px;
+    padding: 2.5rem;
+    backdrop-filter: blur(14px);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.plan-card::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.plan-card.active {
+    border-color: rgba(156, 39, 255, 0.6);
+    background: rgba(15, 12, 26, 0.85);
+    box-shadow: 
+        0 0 30px rgba(156, 39, 255, 0.3),
+        0 0 60px rgba(0, 168, 255, 0.15);
+    transform: translateY(-5px);
+}
+
+.plan-card.active::before {
+    opacity: 1;
+}
+
+.plan-card.inactive {
+    border-color: rgba(128, 128, 128, 0.3);
+    background: rgba(15, 12, 26, 0.4);
+    opacity: 0.7;
+    filter: grayscale(0.3);
+}
+
+.plan-card.inactive:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+    border-color: rgba(128, 128, 128, 0.5);
+}
+
+/* Plan Badge */
+.plan-badge {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, var(--stardust-blue), var(--nebula-purple));
+    color: var(--cosmic-white);
+    padding: 6px 14px;
+    border-radius: 999px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(156, 39, 255, 0.5);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        box-shadow: 0 0 15px rgba(156, 39, 255, 0.5);
+    }
+    50% {
+        box-shadow: 0 0 25px rgba(156, 39, 255, 0.8);
+    }
+}
+
+/* Plan Header */
+.plan-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.plan-name {
+    font-size: 2rem;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.plan-card.inactive .plan-name {
+    color: rgba(255, 255, 255, 0.5);
+    background: none;
+    -webkit-background-clip: unset;
+    background-clip: unset;
+}
+
+.plan-price {
+    font-size: 1.5rem;
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 600;
+}
+
+.plan-card.inactive .plan-price {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Plan Features */
+.plan-features {
+    margin-bottom: 2rem;
+}
+
+.plan-feature {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 0;
+    font-size: 1rem;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.plan-card.inactive .plan-feature {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.feature-icon {
+    font-size: 1.5rem;
+    width: 32px;
+    text-align: center;
+}
+
+/* Plan Usage (FREE only) */
+.plan-usage {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.usage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.usage-count {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: var(--stardust-blue);
+}
+
+.usage-count.limit-reached {
+    color: #ff6b6b;
+}
+
+.usage-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.usage-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    border-radius: 999px;
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px rgba(156, 39, 255, 0.5);
+}
+
+.limit-message {
+    margin-top: 12px;
+    padding: 12px;
+    background: rgba(255, 107, 107, 0.15);
+    border: 1px solid rgba(255, 107, 107, 0.3);
+    border-radius: 8px;
+    color: #ffbdbd;
+    font-size: 0.9rem;
+    text-align: center;
+}
+
+/* Upgrade Button */
+.upgrade-btn {
+    width: 100%;
+    padding: 16px 32px;
+    background: linear-gradient(135deg, var(--stardust-blue), var(--nebula-purple));
+    border: none;
+    border-radius: 12px;
+    color: var(--cosmic-white);
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(156, 39, 255, 0.4);
+    margin-top: 1rem;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(156, 39, 255, 0.6);
+}
+
+.upgrade-btn:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Premium Active */
+.premium-active {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    background: rgba(156, 39, 255, 0.15);
+    border: 1px solid rgba(156, 39, 255, 0.3);
+    border-radius: 12px;
+    color: var(--cosmic-white);
+    font-size: 1rem;
+    font-weight: 600;
+    margin-top: 1rem;
+}
+
+.premium-icon {
+    font-size: 1.5rem;
+    animation: sparkle 2s ease-in-out infinite;
+}
+
+@keyframes sparkle {
+    0%, 100% {
+        transform: scale(1) rotate(0deg);
+    }
+    50% {
+        transform: scale(1.2) rotate(180deg);
+    }
+}
+
+/* Loading State */
+.plans-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    gap: 20px;
+}
+
+.plans-loading .spinner {
+    width: 60px;
+    height: 60px;
+    border: 5px solid rgba(255, 255, 255, 0.15);
+    border-top-color: var(--stardust-blue);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    box-shadow: 0 0 15px var(--stardust-blue);
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.plans-loading p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 768px) {
+    .plans-page {
+        padding: 100px 20px 50px;
+    }
+
+    .plans-title {
+        font-size: 2rem;
+    }
+
+    .plans-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .plan-card {
+        padding: 2rem;
+    }
+
+    .plan-name {
+        font-size: 1.75rem;
+    }
+}
+

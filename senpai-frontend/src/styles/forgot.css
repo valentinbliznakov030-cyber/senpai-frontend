@@ -1,0 +1,176 @@
+.forgot-page {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 120px 20px 60px;
+  background: radial-gradient(circle at top, rgba(125, 53, 255, 0.2), transparent),
+    radial-gradient(circle at bottom, rgba(0, 168, 255, 0.18), transparent);
+}
+
+.forgot-card {
+  width: 100%;
+  max-width: 480px;
+  background: rgba(10, 8, 18, 0.8);
+  border: 1px solid rgba(156, 39, 255, 0.3);
+  border-radius: 22px;
+  padding: 32px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45), 0 0 30px rgba(0, 168, 255, 0.2);
+  backdrop-filter: blur(16px);
+  color: #f5f9ff;
+  animation: fadeInCard 0.5s ease;
+}
+
+@keyframes fadeInCard {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.forgot-error,
+.forgot-status {
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 18px;
+  font-size: 0.95rem;
+  animation: fadeInCard 0.35s ease;
+}
+
+.forgot-error {
+  background: rgba(255, 82, 82, 0.15);
+  border: 1px solid rgba(255, 129, 129, 0.4);
+  color: #ffbbbb;
+}
+
+.forgot-status {
+  background: rgba(0, 187, 255, 0.1);
+  border: 1px solid rgba(0, 187, 255, 0.4);
+  color: #9ce1ff;
+}
+
+.forgot-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  animation: fadeInCard 0.4s ease;
+}
+
+.forgot-form h1 {
+  margin: 0;
+  font-size: 1.8rem;
+  background: linear-gradient(120deg, #6ac8ff, #b867ff);
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+.step-badge {
+  display: inline-flex;
+  align-self: flex-start;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  letter-spacing: 0.03em;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.step-info {
+  margin-top: -6px;
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.5;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.input-group input {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(8, 6, 16, 0.7);
+  padding: 12px 14px;
+  color: #f5f9ff;
+  font-size: 1rem;
+  transition: border 0.2s ease, transform 0.2s ease;
+}
+
+.input-group input:focus {
+  border-color: rgba(0, 181, 255, 0.6);
+  outline: none;
+  transform: translateY(-1px);
+}
+
+.input-group input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.forgot-btn {
+  margin-top: 10px;
+  border: none;
+  border-radius: 14px;
+  padding: 14px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #0a0b13;
+  background: linear-gradient(120deg, #00d4ff, #7d3bff);
+  box-shadow: 0 10px 30px rgba(0, 180, 255, 0.35);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.forgot-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.forgot-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 35px rgba(0, 180, 255, 0.4);
+}
+
+.honeypot {
+  display: none;
+}
+
+.timer {
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.timer.expired {
+  color: #ff9f9f;
+}
+
+.subs-control .subs-error-inline {
+  font-size: 0.85rem;
+}
+
+.success-state {
+  text-align: center;
+  gap: 12px;
+}
+
+.success-icon {
+  font-size: 2.5rem;
+}
+
+@media (max-width: 600px) {
+  .forgot-card {
+    padding: 24px;
+  }
+}
+

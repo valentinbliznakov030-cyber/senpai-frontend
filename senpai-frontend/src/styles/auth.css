@@ -1,0 +1,198 @@
+/* ===== AUTH PAGE (COSMIC ELEGANT THEME) ===== */
+
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: radial-gradient(circle at 20% 20%, rgba(0,168,255,0.1), transparent 60%),
+              radial-gradient(circle at 80% 80%, rgba(255,45,117,0.1), transparent 60%),
+              linear-gradient(135deg, var(--void-black), #1a0a2a);
+  color: var(--cosmic-white);
+  padding-top: 6rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(156,39,255,0.08), transparent 70%);
+  filter: blur(100px);
+  animation: softGlow 15s infinite alternate;
+  z-index: 0;
+}
+
+@keyframes softGlow {
+  0% { opacity: 0.3; transform: scale(1); }
+  100% { opacity: 0.5; transform: scale(1.1); }
+}
+
+.auth-card {
+  position: relative;
+  background: rgba(15, 12, 26, 0.85);
+  border: 1px solid rgba(156, 39, 255, 0.25);
+  border-radius: 20px;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.4);
+  padding: 3rem 3.5rem;
+  width: 400px;
+  backdrop-filter: blur(20px);
+  z-index: 2;
+  animation: fadeIn 0.8s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-card h1 {
+  text-align: center;
+  font-size: 2.4rem;
+  background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 2rem;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 15px rgba(0, 168, 255, 0.3);
+}
+
+/* === FORM === */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 1.5rem;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: var(--stardust-blue);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.5px;
+}
+
+.form-group input {
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  border: 1px solid rgba(156, 39, 255, 0.25);
+  background: rgba(0, 0, 0, 0.4);
+  color: var(--cosmic-white);
+  outline: none;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+  border-color: var(--stardust-blue);
+  box-shadow: 0 0 10px rgba(0, 168, 255, 0.3);
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.form-group input.error-input {
+  border-color: #ff6b6b;
+  box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+}
+
+.form-group .field-error {
+  display: block;
+  color: #ff6b6b;
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  padding-left: 0.5rem;
+  animation: fadeIn 0.3s ease;
+}
+
+/* === MESSAGES === */
+.error, .success {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.error {
+  color: var(--supernova-red);
+}
+
+.success {
+  color: var(--stardust-blue);
+}
+
+/* === BUTTON === */
+button.btn {
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, var(--stardust-blue), var(--nebula-purple));
+  color: white;
+  padding: 0.9rem;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 12px rgba(0, 168, 255, 0.25);
+  transition: all 0.3s ease;
+}
+
+button.btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 168, 255, 0.45);
+  background: linear-gradient(135deg, var(--stardust-blue), var(--supernova-red));
+}
+
+/* === REDIRECT === */
+.redirect {
+  text-align: center;
+  margin-top: 1.5rem;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.redirect a {
+  color: var(--nebula-purple);
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.redirect a:hover {
+  color: var(--stardust-blue);
+  text-shadow: 0 0 10px rgba(0, 168, 255, 0.4);
+}
+
+/* === Animated messages === */
+.error {
+  animation: shake 0.3s ease;
+}
+
+.success {
+  animation: pulseGlow 1s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+
+@keyframes pulseGlow {
+  0% { text-shadow: 0 0 5px var(--stardust-blue); }
+  50% { text-shadow: 0 0 20px var(--stardust-blue); }
+  100% { text-shadow: 0 0 5px var(--stardust-blue); }
+}
+
+.forgot-password {
+  text-align: right;
+  margin-top: 5px;
+}
+
+.forgot-password a {
+  color: var(--nebula-purple);
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.forgot-password a:hover {
+  color: var(--stardust-blue);
+  text-shadow: 0 0 8px rgba(0, 168, 255, 0.5);
+}

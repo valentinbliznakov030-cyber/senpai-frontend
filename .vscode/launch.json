@@ -1,0 +1,33 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "React Vite Debug",
+        "type": "pwa-chrome",
+        "request": "launch",
+        "url": "http://localhost:5173",
+        "webRoot": "${workspaceFolder}",
+        "sourceMaps": true,
+  
+        
+        "skipFiles": [
+          "<node_internals>/**",
+          "node_modules/**",
+          "**/*.hot-update.js",
+          "**/@vite/**",
+          "**/@react-refresh/**",
+          "**/*vite*",
+          "**/react.development.js",
+          "**/react-dom.development.js"
+        ],
+  
+        "resolveSourceMapLocations": [
+          "${workspaceFolder}/**",
+          "!**/node_modules/**",
+          "!**/vite/**",
+          "!**/@vite/**"
+        ]
+      }
+    ]
+  }
+  

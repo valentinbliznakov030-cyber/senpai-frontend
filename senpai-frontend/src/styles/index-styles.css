@@ -1,0 +1,743 @@
+/* ============================================================================
+   SPOTLIGHT — FULLSCREEN NEON HERO SLIDER (PART 1 — CLEAN VERSION)
+   ============================================================================ */
+
+/* Главна секция */
+.spotlight-section-new {
+  position: relative;
+  width: 100%;
+  height: 720px;
+  margin-top: 120px; /* за да не влиза под header */
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+}
+
+/* Контейнер на целия слайд */
+.spotlight-slider {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 20px;
+}
+
+/* ===============================
+      Background Poster
+   =============================== */
+
+.spotlight-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.spotlight-bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: brightness(0.85) saturate(1.3);
+  transform: scale(1.1);
+  transition: transform 1.2s ease;
+}
+
+.spotlight-slider:hover .spotlight-bg img {
+  transform: scale(1.18);
+}
+
+/* Overlay gradient */
+.spotlight-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgba(0,0,0,0.6) 0%,
+    rgba(15,12,26,0.4) 40%,
+    rgba(0,0,0,0.7) 100%
+  );
+}
+
+/* ===============================
+      Spotlight Content
+   =============================== */
+
+.spotlight-content-new {
+  position: absolute;
+  top: 46%;
+  left: 6%;
+  transform: translateY(-40%);
+  width: 45%;
+  z-index: 10;
+  text-shadow: 0 5px 25px rgba(0,0,0,0.7);
+}
+
+.spotlight-rank-new {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--stardust-blue);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+  text-shadow: var(--blue-glow);
+}
+
+.spotlight-title {
+  font-size: 3rem;
+  font-weight: 900;
+  margin-bottom: 8px;
+  background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: var(--blue-glow);
+}
+
+.spotlight-alt {
+  font-size: 1.3rem;
+  color: var(--nebula-purple);
+  margin-bottom: 15px;
+  text-shadow: var(--purple-glow);
+}
+
+/* Описание — стабилен layout */
+.spotlight-desc-new {
+  font-size: 1rem;
+  line-height: 1.6;
+  max-width: 80%;
+  opacity: 0.9;
+  margin-bottom: 22px;
+
+  max-height: 115px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
+
+/* Buttons row */
+.spotlight-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 18px;
+}
+
+/* ===============================
+      Arrows
+   =============================== */
+
+.spotlight-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 2.4rem;
+  font-weight: 300;
+  padding: 0.2rem 1rem;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 20;
+}
+
+.spotlight-arrow.left {
+  left: 15px;
+}
+
+.spotlight-arrow.right {
+  right: 15px;
+}
+
+.spotlight-arrow:hover {
+  background: rgba(0,168,255,0.35);
+  border-color: var(--stardust-blue);
+  box-shadow: var(--blue-glow);
+  transform: translateY(-50%) scale(1.12);
+}
+
+/* ===============================
+      Dots (pagination)
+   =============================== */
+
+.spotlight-dots {
+  position: absolute;
+  bottom: 18px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 30;
+}
+
+.spotlight-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.35);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.spotlight-dot:hover {
+  background: var(--stardust-blue);
+  box-shadow: var(--blue-glow);
+  transform: scale(1.2);
+}
+
+.spotlight-dot.active {
+  background: var(--nebula-purple);
+  box-shadow: var(--purple-glow);
+  transform: scale(1.25);
+}
+
+/* ===============================
+      Mobile Responsive
+   =============================== */
+
+@media (max-width: 900px) {
+  .spotlight-section-new {
+    height: 560px;
+  }
+  .spotlight-content-new {
+    width: 80%;
+    left: 10%;
+  }
+  .spotlight-title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .spotlight-section-new {
+    height: 500px;
+  }
+  .spotlight-content-new {
+    top: 58%;
+    transform: translateY(-48%);
+  }
+  .spotlight-title {
+    font-size: 1.8rem;
+  }
+  .spotlight-desc-new {
+    font-size: 0.9rem;
+    max-height: 90px;
+  }
+}
+
+/* ============================================================================
+   PART 2 — TRENDING, TOP AIRING, SMALL CARDS (ULTRA NEON — WITHOUT FAV BUTTON)
+   ============================================================================ */
+
+/* ===============================
+      SECTION HEADERS
+   =============================== */
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 70px;
+  margin-bottom: 25px;
+}
+
+.section-header h2 {
+  font-size: 2.4rem;
+  font-weight: 900;
+  color: var(--stardust-blue);
+  text-shadow: var(--blue-glow);
+}
+
+.section-header .gradient-text {
+  background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* "Виж всички" */
+.see-all {
+  cursor: pointer;
+  padding: 0.6rem 1.4rem;
+  border-radius: 50px;
+  font-weight: bold;
+
+  background: linear-gradient(45deg, var(--stardust-blue), var(--nebula-purple));
+  color: #fff;
+
+  box-shadow: 0 0 12px rgba(0,168,255,0.5);
+  transition: all 0.3s ease;
+}
+
+.see-all:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 18px rgba(0,168,255,0.7);
+}
+
+/* ===============================
+      GRID LAYOUT
+   =============================== */
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 22px;
+  width: 100%;
+
+  margin-bottom: 40px;
+  padding-bottom: 20px;
+}
+
+/* ============================================================================
+      SMALL CARD (Trending / Top Airing)
+   ============================================================================ */
+
+.small-card {
+  position: relative;
+
+  background: rgba(12, 10, 22, 0.75);
+  border: 1px solid rgba(156, 39, 255, 0.25);
+  border-radius: 16px;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  backdrop-filter: blur(10px);
+
+  padding: 0.8rem;
+  transition: transform 0.35s ease, 
+              box-shadow 0.35s ease, 
+              border-color 0.35s ease;
+  cursor: pointer;
+
+  transform-style: preserve-3d;
+}
+
+.small-card:hover {
+  transform: translateY(-8px) scale(1.03);
+  border-color: var(--stardust-blue);
+  box-shadow: 
+    0 0 25px rgba(0,168,255,0.4),
+    0 10px 30px rgba(0,0,0,0.5);
+}
+
+/* Card image container */
+.small-card-img {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.small-card-img img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transition: transform 0.4s ease, filter 0.3s ease;
+}
+
+/* Zoom on hover */
+.small-card:hover .small-card-img img {
+  transform: scale(1.12);
+  filter: brightness(1.15);
+}
+
+/* ============================================================================
+      SMALL CARD TITLE
+   ============================================================================ */
+
+.small-card h3 {
+  margin-top: 12px;
+  font-size: 1.15rem;
+  font-weight: 700;
+  min-height: 55px;
+
+  color: var(--cosmic-white);
+  text-shadow: 0 0 8px rgba(0,0,0,0.4);
+  padding: 0 6px;
+  line-height: 1.3;
+}
+
+/* ============================================================================
+      BUTTON INSIDE SMALL CARD
+   ============================================================================ */
+
+.small-card .btn-primary {
+  margin-top: 14px;
+  width: 100%;
+  border-radius: 50px;
+  padding: 0.55rem 1rem;
+}
+
+/* ============================================================================
+      TRENDING CUSTOM RANK (small)
+   ============================================================================ */
+
+.trending-rank {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+
+  background: rgba(0,0,0,0.42);
+  color: var(--supernova-red);
+
+  padding: 4px 10px;
+  border-radius: 10px;
+
+  border: 1px solid rgba(255,45,117,0.5);
+
+  font-size: 0.9rem;
+  font-weight: 700;
+
+  z-index: 5;
+  backdrop-filter: blur(4px);
+}
+
+/* ============================================================================
+      TOP AIRING CUSTOM BANNER STYLE
+   ============================================================================ */
+
+.airing-card .airing-banner {
+  height: 300px;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.airing-card .airing-banner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+
+  transition: transform 0.35s ease;
+}
+
+.airing-card:hover .airing-banner img {
+  transform: scale(1.1);
+}
+
+/* ============================================================================
+      RESPONSIVE SMALL CARDS
+   ============================================================================ */
+
+@media (max-width: 1100px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+  }
+
+  .small-card-img {
+    height: 260px;
+  }
+}
+
+@media (max-width: 850px) {
+  .small-card-img {
+    height: 220px;
+  }
+
+  .small-card h3 {
+    font-size: 1.05rem;
+    min-height: 50px;
+  }
+}
+
+@media (max-width: 650px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+  }
+
+  .small-card-img {
+    height: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .grid-container {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .small-card-img {
+    height: 180px;
+  }
+}
+
+/* ============================================================================
+   PART 3 — ULTRA POLISH (HOLOGRAMS, PARTICLES, ENTRANCE ANIMATIONS, FX)
+   ============================================================================ */
+
+/* ============================================================================
+   GLOBAL ANIME PARTICLES FLOATING AROUND SMALL CARDS
+   ============================================================================ */
+
+.small-card::after {
+  content: "";
+  position: absolute;
+  top: -10%;
+  left: -10%;
+  width: 120%;
+  height: 120%;
+
+  background: radial-gradient(
+    circle,
+    rgba(0,168,255,0.12) 0%,
+    transparent 70%
+  );
+
+  opacity: 0;
+  pointer-events: none;
+
+  transform: scale(0.6);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.small-card:hover::after {
+  opacity: 1;
+  transform: scale(1.0);
+}
+
+/* ============================================================================
+   SCANLINE HOLOGRAM EFFECT ON IMAGES (ANIME LAB STYLE)
+   ============================================================================ */
+
+.small-card-img img::after,
+.airing-card .airing-banner img::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background: repeating-linear-gradient(
+    to bottom,
+    rgba(255,255,255,0.02) 0,
+    rgba(255,255,255,0.02) 2px,
+    transparent 3px,
+    transparent 6px
+  );
+
+  pointer-events: none;
+  mix-blend-mode: overlay;
+}
+
+/* ============================================================================
+   HOLOGRAM TITLE FLICKER (FAIRY TAIL TITLE FX)
+   ============================================================================ */
+
+.small-card h3:hover {
+  text-shadow:
+    0 0 10px var(--stardust-blue),
+    0 0 20px var(--nebula-purple),
+    0 0 40px var(--supernova-red);
+  transition: text-shadow 0.3s ease;
+}
+
+/* ============================================================================
+   APPEAR ANIMATION (CARDS ENTER WITH SLIDE + FADE)
+   ============================================================================ */
+
+@keyframes cardEnter {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.small-card,
+.airing-card {
+  animation: cardEnter 0.6s ease forwards;
+}
+
+/* Delay different cards so they feel staggered */
+.small-card:nth-child(1) { animation-delay: 0.05s; }
+.small-card:nth-child(2) { animation-delay: 0.10s; }
+.small-card:nth-child(3) { animation-delay: 0.15s; }
+.small-card:nth-child(4) { animation-delay: 0.20s; }
+.small-card:nth-child(5) { animation-delay: 0.25s; }
+.small-card:nth-child(6) { animation-delay: 0.30s; }
+
+/* ============================================================================
+   ANIME LIGHT SWEEP ON CARD HOVER (Ufotable Lens Shine)
+   ============================================================================ */
+
+.small-card:hover::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -150%;
+  width: 60%;
+  height: 100%;
+
+  background: linear-gradient(
+    75deg,
+    rgba(255,255,255,0.0) 0%,
+    rgba(255,255,255,0.12) 50%,
+    rgba(255,255,255,0.0) 100%
+  );
+
+  transform: skewX(-20deg);
+  animation: shineMove 0.7s ease forwards;
+  pointer-events: none;
+}
+
+@keyframes shineMove {
+  0%   { left: -150%; }
+  100% { left: 200%; }
+}
+
+/* ============================================================================
+   SPOTLIGHT HOLOGRAM BORDER GLOW
+   ============================================================================ */
+
+.spotlight-slider::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  border-radius: 20px;
+  border: 3px solid transparent;
+
+  background: linear-gradient(
+    45deg,
+    var(--stardust-blue),
+    var(--nebula-purple),
+    var(--supernova-red),
+    var(--stardust-blue)
+  );
+
+  background-size: 300%;
+  animation: holoBorder 6s linear infinite;
+
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+
+  padding: 2px;
+  pointer-events: none;
+  opacity: 0.15;
+}
+
+@keyframes holoBorder {
+  0%   { background-position: 0% 50%; }
+  100% { background-position: 300% 50%; }
+}
+
+/* ============================================================================
+   SPOTLIGHT TEXT ENTRANCE (EPIC TRAILER STYLE)
+   ============================================================================ */
+
+@keyframes spotlightFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.spotlight-content-new {
+  animation: spotlightFadeUp 0.9s ease forwards;
+}
+
+/* ============================================================================
+   FLOATING PARTICLES BEHIND SPOTLIGHT CONTENT
+   ============================================================================ */
+
+.spotlight-section-new::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+
+  background-image:
+    radial-gradient(circle, rgba(0,168,255,0.25) 2px, transparent 3px),
+    radial-gradient(circle, rgba(156,39,255,0.25) 2px, transparent 3px),
+    radial-gradient(circle, rgba(255,45,117,0.25) 2px, transparent 3px);
+
+  background-size:
+    200px 200px,
+    280px 280px,
+    350px 350px;
+
+  background-position:
+    10% 20%,
+    70% 50%,
+    40% 80%;
+
+  opacity: 0.15;
+  animation: particlesMove 18s ease-in-out infinite alternate;
+  z-index: 1;
+}
+
+@keyframes particlesMove {
+  0%   { transform: translateY(0); opacity: 0.12; }
+  100% { transform: translateY(-20px); opacity: 0.18; }
+}
+/* ============================================================================
+   🌠 HOME PAGE — API ERROR OVERLAY (uniquely for Home.jsx)
+   ============================================================================
+*/
+
+.home-error-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 999;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  backdrop-filter: blur(12px);
+  background: rgba(0, 0, 0, 0.55);
+
+  animation: homeErrorFadeIn 0.6s ease-out forwards;
+}
+
+@keyframes homeErrorFadeIn {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+.home-error-box {
+  text-align: center;
+  padding: 40px 60px;
+
+  background: rgba(255, 45, 117, 0.15);
+  border: 1px solid rgba(255, 45, 117, 0.6);
+  border-radius: 18px;
+
+  box-shadow:
+    0 0 22px rgba(255, 45, 117, 0.55),
+    0 0 60px rgba(255, 45, 117, 0.25);
+
+  animation: homeErrorPulse 2.8s infinite ease-in-out;
+}
+
+@keyframes homeErrorPulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+.home-error-title {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--supernova-red);
+  margin-bottom: 15px;
+  text-shadow: 0 0 12px rgba(255, 45, 117, 0.6);
+}
+
+.home-error-message {
+  font-size: 1.1rem;
+  color: rgba(255, 200, 210, 0.9);
+  line-height: 1.6;
+  max-width: 600px;
+}

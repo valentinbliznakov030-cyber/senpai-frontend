@@ -1,0 +1,1981 @@
+/* ============================================================
+   🌌 COSMIC WATCH PAGE — PART 1
+   Base Layout + Video Panel + Episodes Panel
+   Cosmic theme: stardust-blue / nebula-purple
+   ============================================================ */
+
+/* ---------- MAIN LAYOUT ---------- */
+.watch-page {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+
+    padding-top: 100px;            /* под хедъра */
+    padding-left: 30px;
+    padding-right: 30px;
+    padding-bottom: 20px;
+
+    color: var(--cosmic-white);
+}
+
+/* ============================================================
+   🎥 VIDEO ZONE
+   ============================================================ */
+
+.video-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column; /* Видеото и бутонът един под друг */
+    align-items: flex-start;
+}
+
+.video-wrapper-container {
+    width: 100%;
+    position: relative;
+}
+
+.top-row {
+    display: flex;
+    flex-direction: row; /* Важно - един до друг, не един под друг */
+    width: 100%;
+    gap: 2rem;
+    align-items: flex-start; /* Започват от едно и също място */
+    margin: 0;
+}
+
+.video-wrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Винаги 16:9 съотношение - дори преди да се зареди видеото */
+
+    background: rgba(15, 12, 26, 0.6);
+    border: 1px solid rgba(156, 39, 255, 0.25);
+    border-radius: 18px;
+
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+
+    box-shadow:
+        0 0 25px rgba(0,0,0,0.45),
+        0 0 25px rgba(156,39,255,0.12);
+}
+
+.video-wrapper video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain !important;   /* ФИКС ЗА ЗУМА */
+    background: black;
+}
+
+/* Video controls bottom container - wraps both subs and favorite buttons */
+.video-controls-bottom {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    width: 100%;
+    margin-top: 15px;
+    align-items: stretch;
+}
+
+.subs-control {
+    flex: 1;
+    padding: 0;
+    min-width: 0;
+}
+
+.subs-control .subs-error-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 96, 96, 0.15);
+    border: 1px solid rgba(255, 120, 120, 0.5);
+    color: #ffbdbd;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+}
+
+.subs-control .subs-error-inline button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.subs-control .subs-error-inline button:hover {
+    color: #ffffff;
+}
+
+/* Subs Login Prompt */
+.subs-control .subs-login-prompt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(255, 193, 7, 0.15);
+    border: 1px solid rgba(255, 193, 7, 0.5);
+    color: #ffd54f;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+}
+
+.subs-control .subs-login-prompt p {
+    margin: 0;
+    flex: 1;
+}
+
+.subs-control .subs-login-prompt button {
+    background: rgba(255, 193, 7, 0.2);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    color: #ffd54f;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.subs-control .subs-login-prompt button:hover {
+    background: rgba(255, 193, 7, 0.3);
+    border-color: rgba(255, 193, 7, 0.6);
+    color: #ffffff;
+}
+
+.subs-control .subs-login-prompt button:last-child {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    min-width: 24px;
+}
+
+/* Subs Button */
+.subs-btn {
+    width: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(0,168,255,0.18),
+        rgba(156,39,255,0.20)
+    );
+    border: 1px solid rgba(0,168,255,0.35);
+    border-radius: 12px;
+    color: #ffffff;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+    box-shadow:
+        0 0 18px rgba(0,168,255,0.35),
+        inset 0 0 18px rgba(0,168,255,0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    line-height: 1;
+    height: auto;
+    min-height: 48px;
+}
+
+.sub-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.subs-btn:hover:not(.disabled) {
+    background: linear-gradient(
+        90deg,
+        rgba(0,168,255,0.35),
+        rgba(156,39,255,0.35)
+    );
+    border-color: rgba(156,39,255,0.6);
+    box-shadow:
+        0 0 26px rgba(156,39,255,0.55),
+        inset 0 0 26px rgba(0,168,255,0.4);
+    transform: translateY(-2px);
+}
+
+.subs-btn.active {
+    background: linear-gradient(
+        90deg,
+        rgba(156,39,255,0.45),
+        rgba(0,168,255,0.45)
+    );
+    border-color: rgba(255,255,255,0.3);
+    box-shadow:
+        0 0 32px rgba(156,39,255,0.75),
+        inset 0 0 32px rgba(0,168,255,0.6);
+}
+
+.subs-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Favorite Button - Next to Subs Button */
+.favorite-control {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+    padding: 0;
+}
+
+.favorite-error-inline {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255, 96, 96, 0.15);
+    border: 1px solid rgba(255, 120, 120, 0.5);
+    color: #ffbdbd;
+    padding: 8px 14px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+}
+
+.favorite-error-inline button {
+    background: transparent;
+    border: none;
+    color: inherit;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.favorite-error-inline button:hover {
+    color: #ffffff;
+}
+
+/* Favorite Login Prompt */
+.favorite-control .favorite-login-prompt {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.5);
+    color: #81c784;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    backdrop-filter: blur(6px);
+}
+
+.favorite-control .favorite-login-prompt p {
+    margin: 0;
+    flex: 1;
+}
+
+.favorite-control .favorite-login-prompt button {
+    background: rgba(76, 175, 80, 0.2);
+    border: 1px solid rgba(76, 175, 80, 0.4);
+    color: #81c784;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    transition: all 0.2s ease;
+}
+
+.favorite-control .favorite-login-prompt button:hover {
+    background: rgba(76, 175, 80, 0.3);
+    border-color: rgba(76, 175, 80, 0.6);
+    color: #ffffff;
+}
+
+.favorite-control .favorite-login-prompt button:last-child {
+    background: transparent;
+    border: none;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+    min-width: 24px;
+}
+
+.favorite-btn {
+    width: 100%;
+    background: linear-gradient(
+        90deg,
+        rgba(76, 175, 80, 0.18),
+        rgba(56, 142, 60, 0.20)
+    );
+    border: 1px solid rgba(76, 175, 80, 0.35);
+    border-radius: 12px;
+    color: #ffffff;
+    padding: 12px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    backdrop-filter: blur(8px);
+    box-shadow:
+        0 0 18px rgba(76, 175, 80, 0.35),
+        inset 0 0 18px rgba(76, 175, 80, 0.22);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-sizing: border-box;
+    line-height: 1;
+    height: auto;
+    min-height: 48px;
+}
+
+.favorite-btn:hover:not(:disabled) {
+    background: linear-gradient(
+        90deg,
+        rgba(76, 175, 80, 0.35),
+        rgba(56, 142, 60, 0.35)
+    );
+    border-color: rgba(76, 175, 80, 0.6);
+    box-shadow:
+        0 0 26px rgba(76, 175, 80, 0.55),
+        inset 0 0 26px rgba(76, 175, 80, 0.4);
+    transform: translateY(-2px);
+}
+
+.favorite-btn.active {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 107, 107, 0.35),
+        rgba(244, 67, 54, 0.35)
+    );
+    border-color: rgba(255, 107, 107, 0.6);
+    box-shadow:
+        0 0 32px rgba(255, 107, 107, 0.75),
+        inset 0 0 32px rgba(255, 107, 107, 0.6);
+}
+
+.favorite-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.favorite-icon {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+.favorite-text {
+    font-size: 1rem;
+    line-height: 1;
+}
+
+/* Upgrade Modal */
+.upgrade-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(0, 0, 0, 0.75);
+    backdrop-filter: blur(8px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.upgrade-modal {
+    position: relative;
+    background: linear-gradient(135deg, rgba(15, 12, 26, 0.95), rgba(30, 20, 50, 0.95));
+    border: 2px solid rgba(156, 39, 255, 0.5);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 90%;
+    box-shadow: 
+        0 0 40px rgba(156, 39, 255, 0.3),
+        0 0 80px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(20px);
+    animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.upgrade-modal-close {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: var(--cosmic-white);
+    font-size: 2rem;
+    line-height: 1;
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.upgrade-modal-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ff6b6b;
+    transform: rotate(90deg);
+}
+
+.upgrade-modal-content {
+    text-align: center;
+    color: var(--cosmic-white);
+}
+
+.upgrade-modal-content h2 {
+    font-size: 1.75rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.upgrade-modal-content p {
+    font-size: 1rem;
+    line-height: 1.6;
+    margin-bottom: 30px;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+.upgrade-modal-btn {
+    background: linear-gradient(135deg, var(--stardust-blue), var(--nebula-purple));
+    border: none;
+    color: var(--cosmic-white);
+    padding: 14px 32px;
+    border-radius: 999px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 20px rgba(156, 39, 255, 0.4);
+}
+
+.upgrade-modal-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 30px rgba(156, 39, 255, 0.6);
+}
+
+.upgrade-modal-btn:active {
+    transform: translateY(0);
+}
+
+/* ---------- LOADING OVER VIDEO ---------- */
+.video-loading-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 50;
+
+    background: rgba(0,0,0,0.45);
+    backdrop-filter: blur(4px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* neon cosmic spinner */
+.spinner {
+    width: 60px;
+    height: 60px;
+
+    border: 5px solid rgba(255,255,255,0.15);
+    border-top-color: var(--stardust-blue);
+    border-radius: 50%;
+
+    animation: spin 0.7s linear infinite;
+    box-shadow: 0 0 15px var(--stardust-blue);
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
+}
+
+/* ============================================================
+   📑 EPISODES PANEL
+   ============================================================ */
+
+.episodes-panel {
+    width: 350px;         /* ФИКСИРАНО – спира разтягането */
+    flex-shrink: 0;       /* да не смазва видеото */
+
+    display: flex;
+    flex-direction: column;
+    
+    /* Височината се определя от видеото - използваме същата височина */
+    align-self: flex-start; /* Започва от същото място като видеото */
+
+    padding: 20px;
+
+    background: rgba(15,12,26,0.65);
+    border-radius: 18px;
+
+    border: 1px solid rgba(156,39,255,0.25);
+    backdrop-filter: blur(14px);
+
+    box-shadow: 0 0 15px rgba(156,39,255,0.15);
+    
+    /* Ограничаваме височината да не надхвърля видеото */
+    max-height: calc((100vw - 60px - 350px - 2rem) * 9 / 16);
+    overflow-y: auto; /* Скролбар ако има много епизоди */
+}
+
+.episodes-panel h3 {
+    font-size: 1.25rem;
+    margin-bottom: 15px;
+
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ---------- EPISODES LIST ---------- */
+.episodes-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+    min-height: 0; /* Важно за flex scrolling */
+    max-height: 100%; /* Не позволява да надхвърли родителя */
+}
+
+.episodes-list::-webkit-scrollbar {
+    width: 8px;
+}
+
+.episodes-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--stardust-blue), var(--nebula-purple));
+    border-radius: 10px;
+}
+
+/* ---------- EPISODE ITEM ---------- */
+.episode-item {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+
+    border: 1px solid rgba(156,39,255,0.15);
+    color: var(--cosmic-white);
+
+    cursor: pointer;
+    transition: 0.25s ease;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.episode-item:hover {
+    border-color: var(--stardust-blue);
+    background: rgba(0,168,255,0.12);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+.episode-item.active {
+    background: rgba(156,39,255,0.22);
+    border-color: var(--nebula-purple);
+    box-shadow: 0 0 12px var(--purple-glow);
+}
+
+/* ripple tap */
+.episode-item::after {
+    content: "";
+    position: absolute;
+
+    width: 0;
+    height: 0;
+
+    background: rgba(0,168,255,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    transition: 0.45s ease;
+}
+
+.episode-item:active::after {
+    width: 180px;
+    height: 180px;
+    opacity: 0.22;
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .watch-page {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .episodes-panel {
+        width: 100%;
+        margin-top: 20px;
+    }
+}
+
+
+/* ============================================================
+   🌌 COSMIC WATCH PAGE — PART 2
+   Pagination + Grid/List Switch + Search + Sticky Header
+   Fully synced with global cosmic theme
+   ============================================================ */
+
+/* ============================================================
+   🔝 EPISODES TOP HEADER (Sticky)
+   ============================================================ */
+
+.episodes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    padding-bottom: 12px;
+    margin-bottom: 14px;
+
+    border-bottom: 1px solid rgba(156,39,255,0.2);
+
+    position: sticky;
+    top: 0;
+    z-index: 40;
+
+    background: rgba(15,12,26,0.8);
+    backdrop-filter: blur(10px);
+}
+
+/* Title inside header */
+.episodes-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ============================================================
+   🔄 VIEW SWITCHER (LIST / GRID)
+   ============================================================ */
+
+.view-switcher {
+    display: flex;
+    gap: 8px;
+}
+
+.view-btn {
+    padding: 6px 12px;
+    border-radius: 10px;
+
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(156,39,255,0.25);
+    color: var(--cosmic-white);
+
+    transition: 0.25s ease;
+}
+
+.view-btn:hover {
+    background: rgba(0,168,255,0.15);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 10px var(--blue-glow);
+    color: white;
+}
+
+.view-btn.active {
+    background: rgba(156,39,255,0.25);
+    border-color: var(--nebula-purple);
+    box-shadow: 0 0 12px var(--purple-glow);
+}
+
+/* ============================================================
+   🔍 EPISODE SEARCH BAR
+   ============================================================ */
+
+.ep-search-box {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.ep-search-input {
+    flex: 1;
+    padding: 10px 14px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(156,39,255,0.25);
+
+    border-radius: 12px;
+
+    color: white;
+    transition: 0.25s ease;
+}
+
+.ep-search-input::placeholder {
+    color: rgba(255,255,255,0.5);
+}
+
+.ep-search-input:focus {
+    background: rgba(0,168,255,0.15);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* search icon button */
+.ep-search-btn {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(156,39,255,0.25);
+
+    border-radius: 12px;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+    color: white;
+}
+
+.ep-search-btn:hover {
+    background: rgba(0,168,255,0.25);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* ============================================================
+   🔢 PAGINATION (001–100 / 101–200)
+   ============================================================ */
+
+.ep-pagination {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+}
+
+.ep-pagination::-webkit-scrollbar {
+    height: 6px;
+}
+
+.ep-pagination::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--stardust-blue), var(--nebula-purple));
+    border-radius: 10px;
+}
+
+.page-btn {
+    padding: 8px 16px;
+    border-radius: 12px;
+
+    border: 1px solid rgba(156,39,255,0.25);
+    background: rgba(255,255,255,0.04);
+
+    color: white;
+    font-size: 0.85rem;
+    font-weight: 500;
+
+    cursor: pointer;
+    flex-shrink: 0;
+
+    transition: 0.25s ease;
+}
+
+.page-btn:hover {
+    background: rgba(0,168,255,0.18);
+    border-color: var(--stardust-blue);
+    color: white;
+    box-shadow: 0 0 10px var(--blue-glow);
+}
+
+.page-btn.active {
+    background: rgba(156,39,255,0.22);
+    border-color: var(--nebula-purple);
+    box-shadow: 0 0 12px var(--purple-glow);
+
+    color: var(--nebula-purple);
+}
+
+/* ============================================================
+   🧩 GRID MODE (auto when many episodes)
+   ============================================================ */
+
+.episodes-list.grid-mode {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
+    gap: 10px;
+}
+
+.episode-item.grid {
+    padding: 14px 0;
+    text-align: center;
+    border-radius: 10px;
+}
+
+.episode-item.grid.active {
+    background: rgba(156,39,255,0.25);
+}
+
+.episode-item.grid:hover {
+    background: rgba(0,168,255,0.25);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* ============================================================
+   🌠 BONUS HOVER EFFECTS — COSMIC BEAM
+   ============================================================ */
+
+.episode-item:hover::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(120deg,
+        rgba(0,168,255,0.15),
+        transparent 70%
+    );
+
+    pointer-events: none;
+}
+
+/* ============================================================
+   📱 RESPONSIVE — PART 2
+   ============================================================ */
+
+@media (max-width: 780px) {
+    .episodes-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+
+    .view-switcher {
+        align-self: flex-end;
+    }
+
+    .ep-search-box {
+        flex-direction: column;
+    }
+
+    .ep-search-btn {
+        width: 100%;
+    }
+
+    .ep-pagination {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+    }
+}
+/* ============================================================
+   🌌 COSMIC WATCH PAGE — PART 3
+   Video Header + Next Episode Bar + Hover Preview + Alerts
+   ============================================================ */
+
+/* ============================================================
+   🎬 VIDEO TOP HEADER — “Now Watching”
+   ============================================================ */
+
+.video-top-header {
+    width: 100%;
+    padding: 12px 18px;
+
+    margin-bottom: 12px;
+
+    background: rgba(15,12,26,0.55);
+    border: 1px solid rgba(156,39,255,0.25);
+
+    border-radius: 14px;
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.video-top-header .anime-title {
+    font-size: 1.15rem;
+    font-weight: 600;
+
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.video-top-header .ep-number {
+    font-size: 0.9rem;
+    opacity: 0.85;
+}
+
+/* ============================================================
+   🔥 VIDEO FRAME ENHANCEMENT — COSMIC GLOW
+   ============================================================ */
+
+.video-wrapper {
+    animation: videoGlowBreath 6s ease-in-out infinite;
+}
+
+@keyframes videoGlowBreath {
+    0% { box-shadow: 0 0 25px rgba(0,168,255,0.2); }
+    50% { box-shadow: 0 0 35px rgba(156,39,255,0.25); }
+    100% { box-shadow: 0 0 25px rgba(0,168,255,0.2); }
+}
+
+/* ============================================================
+   ⏭️ NEXT EPISODE BAR (FLOATING)
+   ============================================================ */
+
+.next-ep-bar {
+    margin-top: 14px;
+    padding: 12px 16px;
+
+    background: rgba(15,12,26,0.65);
+    border: 1px solid rgba(0,168,255,0.25);
+    border-radius: 12px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+
+    box-shadow: 0 0 15px rgba(0,168,255,0.1);
+}
+
+.next-ep-bar:hover {
+    background: rgba(0,168,255,0.18);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 25px var(--blue-glow);
+}
+
+.next-ep-label {
+    font-weight: 600;
+}
+
+.next-ep-number {
+    opacity: 0.8;
+}
+
+/* ============================================================
+   🎞️ EPISODE HOVER PREVIEW THUMBNAIL
+   ============================================================ */
+
+.ep-preview-box {
+    position: absolute;
+    top: 50%;
+    left: -170px;
+
+    width: 150px;
+    height: 85px;
+
+    transform: translateY(-50%);
+    border-radius: 10px;
+
+    background: rgba(0,0,0,0.85);
+    border: 1px solid rgba(0,168,255,0.3);
+
+    box-shadow: 0 0 15px rgba(0,168,255,0.25);
+
+    display: none;
+    overflow: hidden;
+    z-index: 500;
+}
+
+.episode-item:hover .ep-preview-box {
+    display: block;
+}
+
+.ep-preview-box img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* ============================================================
+   ⚠️ VIDEO ERROR ALERT BOX
+   ============================================================ */
+
+.video-error {
+    padding: 18px;
+    border-radius: 12px;
+
+    border: 1px solid var(--supernova-red);
+    background: rgba(255,45,117,0.15);
+
+    color: var(--supernova-red);
+    text-align: center;
+    font-weight: 600;
+
+    margin-top: 20px;
+    box-shadow: 0 0 12px rgba(255,45,117,0.5);
+}
+
+/* ============================================================
+   🌌 EMPTY STATE (no video yet)
+   ============================================================ */
+
+.video-empty {
+    flex: 1;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    color: rgba(255,255,255,0.6);
+    text-align: center;
+
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+}
+
+/* ============================================================
+   💬 SUBTITLES SELECTOR (UI ONLY)
+   ============================================================ */
+
+.subtitles-bar {
+    margin-top: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.subtitles-select {
+    padding: 8px 12px;
+    border-radius: 10px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(156,39,255,0.25);
+
+    color: white;
+    cursor: pointer;
+
+    transition: 0.25s;
+}
+
+.subtitles-select:hover {
+    background: rgba(0,168,255,0.15);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 10px var(--blue-glow);
+}
+
+/* ============================================================
+   📱 RESPONSIVE — PART 3
+   ============================================================ */
+
+@media (max-width: 900px) {
+    .ep-preview-box {
+        display: none !important;
+    }
+
+    .next-ep-bar {
+        padding: 10px 12px;
+    }
+}
+
+@media (max-width: 600px) {
+    .video-top-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+    }
+}
+
+/* ============================================================
+   ⚠️ VIDEO ERROR OVERLAY — Cosmic Style
+   ============================================================ */
+
+.video-error-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 120;
+
+    background: rgba(8, 6, 18, 0.72);
+    backdrop-filter: blur(10px);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    animation: fadeIn 0.3s ease-out;
+}
+
+.video-error-box {
+    padding: 28px 36px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,45,117,0.45);
+
+    border-radius: 16px;
+    backdrop-filter: blur(6px);
+
+    text-align: center;
+    color: #fff;
+
+    box-shadow:
+        0 0 25px rgba(255,45,117,0.35),
+        0 0 45px rgba(0,168,255,0.15);
+
+    animation: popIn 0.25s ease-out;
+}
+
+.video-error-box h2 {
+    margin-bottom: 8px;
+    font-size: 1.4rem;
+
+    background: linear-gradient(90deg, #ff2d75, #ff6ea6);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.video-error-box p {
+    font-size: 1rem;
+    opacity: 0.85;
+    margin-bottom: 18px;
+}
+
+.video-error-box button {
+    padding: 10px 18px;
+
+    background: rgba(255,45,117,0.25);
+    border: 1px solid rgba(255,45,117,0.5);
+
+    border-radius: 12px;
+    color: #fff;
+    font-weight: 600;
+    cursor: pointer;
+
+    transition: 0.25s ease;
+}
+
+.video-error-box button:hover {
+    background: rgba(255,45,117,0.4);
+    box-shadow: 0 0 18px rgba(255,45,117,0.45);
+}
+
+/* animations */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+@keyframes popIn {
+    from {
+        opacity: 0;
+        transform: scale(0.88);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+/* ============================================================
+   🌠 HONKAI STAR RAIL — MEGA COSMIC VIDEO & SUBTITLE BUTTONS
+   Super detailed, 250+ lines of pure cosmic UI effects
+   ============================================================ */
+
+/* ============================================================
+   🔮 GLOBAL COSMIC BUTTON VARIABLES
+   ============================================================ */
+
+:root {
+    --hsr-border: rgba(0,168,255,0.35);
+    --hsr-border-active: rgba(156,39,255,0.45);
+    --hsr-bg: rgba(255,255,255,0.05);
+    --hsr-hover-bg: rgba(0,168,255,0.15);
+    --hsr-active-bg: rgba(156,39,255,0.25);
+
+    --hsr-glow-blue: 0 0 18px rgba(0,168,255,0.35);
+    --hsr-glow-purple: 0 0 18px rgba(156,39,255,0.35);
+    --hsr-inner-glow-blue: inset 0 0 16px rgba(0,168,255,0.35);
+    --hsr-inner-glow-purple: inset 0 0 18px rgba(156,39,255,0.45);
+}
+
+/* ============================================================
+   🎛️ CONTROL WRAPPER
+   ============================================================ */
+
+.hsr-controls-bar {
+    position: absolute;
+    bottom: 18px;
+    right: 18px;
+
+    display: flex;
+    gap: 16px;
+
+    z-index: 200;
+    pointer-events: none;
+}
+
+.hsr-controls-bar button {
+    pointer-events: auto;
+}
+
+/* ============================================================
+   🌀 BASE BUTTON (HSR STYLE)
+   ============================================================ */
+
+.hsr-btn {
+    width: 70px;
+    height: 70px;
+
+    background: var(--hsr-bg);
+    border: 1px solid var(--hsr-border);
+    border-radius: 18px;
+
+    backdrop-filter: blur(8px);
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    cursor: pointer;
+    transition: 0.3s ease;
+
+    box-shadow:
+        var(--hsr-glow-blue),
+        var(--hsr-inner-glow-blue);
+}
+
+.hsr-btn:hover {
+    background: var(--hsr-hover-bg);
+    border-color: var(--stardust-blue);
+
+    box-shadow:
+        0 0 28px var(--stardust-blue),
+        inset 0 0 22px rgba(0,168,255,0.5);
+}
+
+.hsr-btn:active {
+    transform: scale(0.93);
+    box-shadow:
+        0 0 28px var(--nebula-purple),
+        inset 0 0 22px rgba(156,39,255,0.65);
+}
+
+/* ============================================================
+   ▶️ PLAY BUTTON — ULTRA ANIMATED
+   ============================================================ */
+
+.hsr-play-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 24px;
+
+    animation: hsrPulseUltra 5s infinite ease-in-out;
+}
+
+@keyframes hsrPulseUltra {
+    0% {
+        box-shadow:
+            0 0 18px rgba(0,168,255,0.45),
+            inset 0 0 18px rgba(0,168,255,0.25);
+    }
+    40% {
+        box-shadow:
+            0 0 35px rgba(156,39,255,0.5),
+            inset 0 0 32px rgba(156,39,255,0.35);
+    }
+    100% {
+        box-shadow:
+            0 0 18px rgba(0,168,255,0.45),
+            inset 0 0 18px rgba(0,168,255,0.25);
+    }
+}
+
+.hsr-play-btn .icon {
+    font-size: 34px;
+    color: white;
+    text-shadow:
+        0 0 12px var(--stardust-blue),
+        0 0 22px rgba(0,168,255,0.8);
+}
+
+/* ============================================================
+   💬 SUBTITLES BUTTON — WITH TOGGLE EFFECTS
+   ============================================================ */
+
+.hsr-sub-btn {
+    position: relative;
+}
+
+.hsr-sub-btn .icon {
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+
+    letter-spacing: 1px;
+
+    text-shadow:
+        0 0 10px var(--stardust-blue),
+        0 0 16px rgba(0,168,255,0.65);
+}
+
+/* ON ACTIVE (Subtitles ON) */
+.hsr-sub-btn.active {
+    background: var(--hsr-active-bg);
+    border-color: var(--hsr-border-active);
+
+    box-shadow:
+        var(--hsr-glow-purple),
+        var(--hsr-inner-glow-purple);
+}
+
+.hsr-sub-btn.active:hover {
+    background: rgba(156,39,255,0.32);
+    box-shadow:
+        0 0 24px var(--nebula-purple),
+        inset 0 0 24px rgba(156,39,255,0.55);
+}
+
+/* ============================================================
+   🌈 SUBTITLE ACTIVE RING ANIMATION
+   ============================================================ */
+
+.hsr-sub-btn.active::after {
+    content: "";
+
+    position: absolute;
+    inset: -6px;
+
+    border-radius: 20px;
+
+    border: 2px solid rgba(156,39,255,0.4);
+    animation: hsrRipple 2.6s infinite ease-out;
+}
+
+@keyframes hsrRipple {
+    0% { opacity: 0.5; transform: scale(1); }
+    60% { opacity: 0.15; transform: scale(1.35); }
+    100% { opacity: 0; transform: scale(1.55); }
+}
+
+/* ============================================================
+   🌌 FLOATING & BREATHING EFFECTS
+   ============================================================ */
+
+.hsr-btn {
+    animation: hsrFloat 6s ease-in-out infinite;
+}
+
+@keyframes hsrFloat {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-6px); }
+    100% { transform: translateY(0px); }
+}
+
+/* ============================================================
+   🧿 COSMIC PARTICLES AROUND BUTTONS
+   ============================================================ */
+
+.hsr-btn::before {
+    content: "";
+    position: absolute;
+    inset: -12px;
+
+    border-radius: 22px;
+
+    background: radial-gradient(
+        circle,
+        rgba(0,168,255,0.12),
+        transparent 70%
+    );
+
+    opacity: 0;
+    transition: 0.35s;
+}
+
+.hsr-btn:hover::before {
+    opacity: 1;
+}
+
+/* ============================================================
+   🌠 STARFIELD PARTICLE EMISSION ON CLICK
+   ============================================================ */
+
+.hsr-btn:active::after {
+    content: "";
+    position: absolute;
+    width: 120%;
+    height: 120%;
+
+    border-radius: 30px;
+
+    background: radial-gradient(
+        circle,
+        rgba(255,255,255,0.25),
+        transparent 70%
+    );
+
+    animation: starburst 0.35s ease-out;
+}
+
+@keyframes starburst {
+    from { transform: scale(0); opacity: 0.8; }
+    to { transform: scale(1.6); opacity: 0; }
+}
+
+/* ============================================================
+   📱 RESPONSIVE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 720px) {
+    .hsr-controls-bar {
+        bottom: 14px;
+        right: 14px;
+        gap: 12px;
+    }
+
+    .hsr-btn {
+        width: 58px;
+        height: 58px;
+        border-radius: 14px;
+    }
+
+    .hsr-play-btn {
+        width: 74px;
+        height: 74px;
+    }
+
+    .hsr-play-btn .icon {
+        font-size: 28px;
+    }
+}
+/* Removed duplicate - using the definition above */
+.big-play-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 20;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: rgba(0,0,0,0.25);
+    backdrop-filter: blur(3px);
+}
+.big-play-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 22px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,168,255,0.35);
+
+    backdrop-filter: blur(8px);
+    cursor: pointer;
+
+    font-size: 28px;
+    color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    box-shadow:
+        0 0 20px rgba(0,168,255,0.35),
+        inset 0 0 15px rgba(0,168,255,0.25);
+
+    transition: 0.3s ease;
+}
+
+.big-play-btn:hover {
+    background: rgba(0,168,255,0.12);
+    border-color: var(--stardust-blue);
+    box-shadow:
+        0 0 24px var(--blue-glow),
+        inset 0 0 20px rgba(0,168,255,0.45);
+}
+/* Removed duplicate .subs-btn definition - using the one above for video player */
+
+
+.comment-menu-btn {
+    user-select: none;
+}
+
+/* ============================================================
+   💬 COSMIC COMMENT SECTION — Anime HSR Glow Style
+   ============================================================ */
+
+.comments-wrapper {
+    padding: 22px;
+
+    background: rgba(15,12,26,0.55);
+    border: 1px solid rgba(156,39,255,0.25);
+    border-radius: 18px;
+
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 25px rgba(0,0,0,0.45);
+
+    max-width: 820px;
+}
+
+/* ============================================================
+   ✏️ ADD COMMENT BOX
+   ============================================================ */
+
+.comment-add-box {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+
+    margin-bottom: 20px;
+    padding-bottom: 14px;
+
+    border-bottom: 1px solid rgba(156,39,255,0.25);
+}
+
+.comment-input-wrapper {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.comment-user-avatar {
+    width: 42px;
+    height: 42px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(156,39,255,0.35);
+    border-radius: 50%;
+
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+
+    backdrop-filter: blur(6px);
+    box-shadow: 0 0 12px rgba(156,39,255,0.25);
+}
+
+.comment-input {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(156,39,255,0.2);
+
+    border-radius: 14px;
+    color: white;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+
+    transition: 0.3s ease;
+}
+
+.comment-input:focus {
+    background: rgba(0,168,255,0.12);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+.comment-controls {
+    display: flex;
+    gap: 12px;
+}
+
+.comment-controls button {
+    padding: 8px 16px;
+
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(156,39,255,0.3);
+
+    border-radius: 12px;
+    color: white;
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.comment-controls button:hover {
+    background: rgba(0,168,255,0.2);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 10px var(--blue-glow);
+}
+
+/* ============================================================
+   💬 COMMENT ITEM BASE
+   ============================================================ */
+
+.comment-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+
+    padding: 16px;
+    margin-bottom: 14px;
+
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(156,39,255,0.15);
+
+    border-radius: 14px;
+
+    transition: 0.25s ease;
+}
+
+.comment-item:hover {
+    border-color: var(--stardust-blue);
+    background: rgba(0,168,255,0.08);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* My comment (highlight) */
+.my-comment {
+    background: rgba(156,39,255,0.12);
+    border-color: rgba(156,39,255,0.35);
+    box-shadow: 0 0 12px rgba(156,39,255,0.25);
+}
+
+.comment-avatar {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(156,39,255,0.25);
+    border-radius: 50%;
+
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+}
+
+.comment-body {
+    flex: 1;
+}
+
+.comment-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+
+    margin-bottom: 6px;
+}
+
+.comment-author {
+    color: var(--stardust-blue);
+    font-weight: 600;
+}
+
+.comment-you-tag {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.85rem;
+}
+
+.comment-content {
+    color: rgba(255,255,255,0.9);
+    line-height: 1.6;
+    word-wrap: break-word;
+}
+
+.comments-section-block {
+    margin-bottom: 20px;
+}
+
+/* ============================================================
+   ⋮ COMMENT MENU BUTTON
+   ============================================================ */
+
+.comment-menu-btn {
+    margin-left: auto;
+    cursor: pointer;
+
+    font-size: 20px;
+    color: rgba(255,255,255,0.75);
+
+    padding: 3px 6px;
+    transition: 0.25s ease;
+}
+
+.comment-menu-btn:hover {
+    color: white;
+    text-shadow: 0 0 10px var(--stardust-blue);
+}
+
+/* ============================================================
+   ☰ FLOATING MENU
+   ============================================================ */
+
+.comment-menu {
+    position: absolute;
+    margin-top: 6px;
+    right: 12px;
+
+    background: rgba(15,12,26,0.9);
+    border: 1px solid rgba(156,39,255,0.45);
+    border-radius: 12px;
+
+    backdrop-filter: blur(10px);
+    box-shadow:
+        0 0 18px rgba(0,168,255,0.35),
+        inset 0 0 22px rgba(0,168,255,0.25);
+
+    overflow: hidden;
+    animation: menuPop 0.2s ease-out;
+}
+
+@keyframes menuPop {
+    from { opacity: 0; transform: translateY(-6px) scale(0.9); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.comment-menu div {
+    padding: 10px 18px;
+    cursor: pointer;
+    color: white;
+
+    transition: 0.2s;
+}
+
+.comment-menu div:hover {
+    background: rgba(0,168,255,0.18);
+}
+
+/* ============================================================
+   ✏️ EDIT MODE
+   ============================================================ */
+
+.edit-section {
+    margin-top: 10px;
+}
+
+.edit-input {
+    width: 100%;
+    padding: 10px 14px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,168,255,0.25);
+
+    border-radius: 12px;
+    color: white;
+
+    transition: 0.25s;
+}
+
+.edit-input:focus {
+    background: rgba(0,168,255,0.1);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+.edit-controls {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+}
+
+.edit-controls button {
+    padding: 8px 14px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(156,39,255,0.3);
+
+    border-radius: 12px;
+    color: white;
+
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.edit-controls button:hover {
+    background: rgba(156,39,255,0.25);
+    box-shadow: 0 0 12px var(--purple-glow);
+}
+
+/* ============================================================
+   🔽 LOAD MORE BUTTON
+   ============================================================ */
+
+.load-more-btn {
+    margin: 10px auto 0;
+    display: block;
+
+    padding: 10px 18px;
+
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(0,168,255,0.25);
+
+    border-radius: 12px;
+    color: white;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.load-more-btn:hover {
+    background: rgba(0,168,255,0.22);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+
+/* ============================================================
+   💬 COMMENTS TITLE
+   ============================================================ */
+
+.comments-title {
+    margin: 0 0 20px 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    
+    background: linear-gradient(90deg, var(--stardust-blue), var(--nebula-purple));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+/* ============================================================
+   🔐 LOGIN PROMPT — Not logged in
+   ============================================================ */
+
+.comment-login-prompt {
+    padding: 24px;
+    margin-bottom: 20px;
+    text-align: center;
+    
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(156,39,255,0.2);
+    border-radius: 14px;
+    
+    color: rgba(255,255,255,0.7);
+    font-size: 0.95rem;
+}
+
+.comment-login-prompt p {
+    margin: 0 0 14px 0;
+    line-height: 1.6;
+}
+
+.comment-login-btn {
+    padding: 10px 24px;
+    
+    background: linear-gradient(90deg, rgba(0,168,255,0.2), rgba(156,39,255,0.2));
+    border: 1px solid rgba(0,168,255,0.35);
+    border-radius: 12px;
+    
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    
+    transition: 0.25s ease;
+}
+
+.comment-login-btn:hover {
+    background: linear-gradient(90deg, rgba(0,168,255,0.35), rgba(156,39,255,0.35));
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 15px var(--blue-glow);
+    transform: translateY(-2px);
+}
+
+/* ============================================================
+   📭 EMPTY STATE — No Comments
+   ============================================================ */
+
+.comments-empty,
+.comments-loading {
+    text-align: center;
+    padding: 30px 20px;
+    color: rgba(255,255,255,0.6);
+    font-size: 0.95rem;
+}
+
+.comments-empty p,
+.comments-loading p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+
+/* .top-row is defined above - removed duplicate */
+
+.comment-user-avatar {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: linear-gradient(145deg, var(--stardust-blue), var(--nebula-purple));
+    font-weight: 700;
+    color: white;
+
+    box-shadow: 0 0 10px rgba(0,168,255,0.35);
+}
+
+/* Removed duplicate - using the one above */
+
+.comment-input:focus {
+    background: rgba(0,168,255,0.12);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 0 12px var(--blue-glow);
+}
+.comment-controls {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.comment-controls button {
+    padding: 8px 14px;
+    border-radius: 10px;
+    border: 1px solid rgba(156,39,255,0.35);
+
+    background: rgba(255,255,255,0.06);
+    color: white;
+    font-size: 0.9rem;
+
+    cursor: pointer;
+    transition: 0.25s ease;
+}
+
+.comment-controls button:hover {
+    background: rgba(0,168,255,0.2);
+    box-shadow: 0 0 12px var(--blue-glow);
+}

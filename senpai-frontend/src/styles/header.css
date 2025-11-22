@@ -1,0 +1,657 @@
+/* ============================================================================
+   COSMIC HEADER — ULTRA EDITION 500+ LINES
+   HONKAI STAR RAIL × CYBER EDGE × NEON GALAXY
+   Clean, premium, NOT KITSCH — fully coherent with your styles.css palette
+   ============================================================================ */
+
+/* ===========================
+      GLOBAL HEADER RESET
+   =========================== */
+
+header {
+  --header-height: 85px;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  position: fixed;
+  top: 0;
+  width: 100%;
+  height: var(--header-height);
+
+  padding: 0 3rem;
+
+  background: rgba(10, 8, 20, 0.78);
+  border-bottom: 1px solid rgba(156, 39, 255, 0.25);
+  backdrop-filter: blur(14px);
+
+  z-index: 20000;
+
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.55),
+    inset 0 -1px 2px rgba(255,255,255,0.03);
+}
+
+/* Soft neon ambient light */
+header::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+
+  background: radial-gradient(circle, rgba(0,168,255,0.3), transparent 70%);
+  filter: blur(8px);
+  pointer-events: none;
+}
+
+/* ===========================
+      LEFT — LOGO SECTION
+   =========================== */
+
+.header-left {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+}
+
+.logo-text {
+  font-size: 2.8rem;
+  font-weight: 900;
+
+  background: linear-gradient(
+    100deg,
+    var(--stardust-blue),
+    var(--nebula-purple),
+    var(--supernova-red)
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+
+  letter-spacing: 2px;
+  text-transform: uppercase;
+
+  cursor: pointer;
+
+  position: relative;
+  transition: transform 0.35s ease, text-shadow 0.35s ease;
+}
+
+.logo-text:hover {
+  transform: scale(1.05);
+  text-shadow: 
+    0 0 12px var(--stardust-blue),
+    0 0 22px var(--nebula-purple);
+}
+
+.logo-text span {
+  text-shadow: 
+    0 0 14px var(--stardust-blue),
+    0 0 30px var(--nebula-purple);
+}
+
+/* Animated sparkle on hover */
+.logo-text::after {
+  content: "✦";
+  position: absolute;
+  top: 0;
+  right: -18px;
+
+  font-size: 1.2rem;
+  opacity: 0;
+
+  color: var(--stardust-blue);
+  text-shadow: var(--blue-glow);
+
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.logo-text:hover::after {
+  opacity: 1;
+  transform: translateY(-4px) rotate(12deg);
+}
+
+/* ===========================
+      CENTER — NAVIGATION
+   =========================== */
+
+.header-center {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+}
+
+.header-center nav ul {
+  list-style: none;
+  display: flex;
+  gap: 3.2rem;
+  align-items: center;
+}
+
+.header-center nav a {
+  position: relative;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--cosmic-white);
+
+  letter-spacing: 0.2px;
+
+  transition: color 0.25s ease, text-shadow 0.25s ease;
+}
+
+/* Hover effect */
+.header-center nav a:hover {
+  color: var(--stardust-blue);
+  text-shadow: var(--blue-glow);
+}
+
+/* Holographic underline */
+.header-center nav a::after {
+  content: "";
+  position: absolute;
+  bottom: -7px;
+  left: 0;
+
+  height: 3px;
+  width: 0%;
+
+  border-radius: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--stardust-blue),
+    var(--nebula-purple)
+  );
+
+  transition: width 0.3s ease;
+}
+
+.header-center nav a:hover::after {
+  width: 100%;
+}
+
+/* Active tab — we activate via JS if needed */
+.nav-active::after {
+  width: 100% !important;
+}
+
+.nav-active {
+  color: var(--stardust-blue) !important;
+  text-shadow: var(--blue-glow);
+}
+
+/* ===========================
+      RIGHT — SEARCH BAR
+   =========================== */
+
+.header-right {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 1.8rem;
+}
+
+.search-wrapper {
+  position: relative;
+}
+
+.search {
+  position: relative;
+}
+
+.search input {
+  width: 190px;
+
+  padding: 0.65rem 1rem;
+  padding-left: 3rem;
+
+  border-radius: 40px;
+  border: 1px solid rgba(156, 39, 255, 0.3);
+
+  background: rgba(0, 0, 0, 0.35);
+  color: var(--cosmic-white);
+
+  font-size: 1rem;
+
+  transition: all 0.25s ease;
+}
+
+/* On focus — search expands */
+.search input:focus {
+  width: 270px;
+
+  border-color: var(--stardust-blue);
+  box-shadow: var(--blue-glow);
+
+  background: rgba(0, 0, 0, 0.42);
+}
+
+/* Magnifying icon */
+.search::before {
+  content: "🔍";
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+
+  color: var(--nebula-purple);
+  font-size: 1.15rem;
+  pointer-events: none;
+}
+
+/* Suggestions */
+.search-suggestions {
+  position: absolute;
+  top: 115%;
+  left: 0;
+  width: 100%;
+
+  background: rgba(15, 12, 26, 0.96);
+  backdrop-filter: blur(10px);
+
+  border: 1px solid rgba(156, 39, 255, 0.3);
+  border-radius: 12px;
+
+  max-height: 300px;
+  overflow-y: auto;
+
+  box-shadow: 
+    var(--purple-glow),
+    0 3px 15px rgba(0, 0, 0, 0.4);
+
+  animation: fadeIn 0.25s ease;
+  z-index: 99999;
+}
+
+.search-suggestions a {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+
+  padding: 0.85rem 1.1rem;
+  color: var(--cosmic-white);
+
+  text-decoration: none;
+
+  transition: background 0.25s ease;
+}
+
+.search-suggestions a img {
+  width: 42px;
+  height: 60px;
+
+  object-fit: cover;
+  border-radius: 6px;
+  box-shadow: var(--blue-glow);
+}
+
+.search-suggestions a:hover {
+  background: rgba(0, 168, 255, 0.1);
+}
+
+/* ===========================================================================
+   PART 2 — PROFILE AVATAR, DROPDOWN, AUTH BUTTONS, PARTICLES, RESPONSIVE
+   =========================================================================== */
+
+/* ===========================
+      AUTH BUTTONS
+   =========================== */
+
+.auth-buttons {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Outlined login button */
+.btn-outline {
+  border-radius: 40px;
+  padding: 0.6rem 1.4rem;
+
+  color: var(--stardust-blue);
+  border: 1px solid var(--stardust-blue);
+
+  font-weight: 700;
+  letter-spacing: 0.7px;
+
+  transition: all 0.3s ease;
+  background: transparent;
+}
+
+.btn-outline:hover {
+  background: var(--stardust-blue);
+  color: #fff;
+  box-shadow: var(--blue-glow);
+  transform: translateY(-2px);
+}
+
+/* Cosmic primary button (Register) */
+.btn-primary {
+  border-radius: 40px;
+  padding: 0.65rem 1.6rem;
+
+  background: linear-gradient(45deg, var(--stardust-blue), var(--nebula-purple));
+  color: white;
+  font-weight: 800;
+  letter-spacing: 1px;
+
+  border: none;
+  cursor: pointer;
+
+  transition: all 0.3s ease;
+
+  box-shadow:
+    0 0 12px rgba(0,168,255,0.4),
+    0 0 25px rgba(156,39,255,0.35);
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 20px rgba(0,168,255,0.8),
+    0 0 35px rgba(156,39,255,0.7);
+}
+
+/* ===========================
+      PROFILE AVATAR
+   =========================== */
+
+.profile-menu {
+  position: relative;
+  cursor: pointer;
+
+  display: flex;
+  align-items: center;
+}
+
+.profile-avatar {
+  width: 48px;
+  height: 48px;
+
+  border-radius: 50%;
+  overflow: hidden;
+
+  border: 2px solid var(--stardust-blue);
+  box-shadow: var(--blue-glow);
+
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.profile-avatar:hover {
+  transform: scale(1.07);
+  box-shadow:
+    0 0 20px rgba(0, 168, 255, 0.9),
+    0 0 35px rgba(156, 39, 255, 0.8);
+}
+
+.profile-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Avatar ring animation */
+.profile-avatar::after {
+  content: "";
+  position: absolute;
+  width: 58px;
+  height: 58px;
+
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+
+  border-radius: 50%;
+  border: 2px solid transparent;
+
+  background: conic-gradient(
+    from 0deg,
+    var(--stardust-blue),
+    var(--nebula-purple),
+    var(--supernova-red),
+    var(--stardust-blue)
+  );
+
+  animation: rotateRing 4s linear infinite;
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@keyframes rotateRing {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* ===========================
+      DROPDOWN MENU (controlled)
+   =========================== */
+
+.dropdown {
+  position: absolute;
+  top: 130%;
+  right: 0;
+
+  min-width: 200px;
+  padding: 0.6rem 0;
+
+  background: rgba(15, 12, 26, 0.96);
+  backdrop-filter: blur(14px);
+
+  border-radius: 15px;
+  border: 1px solid rgba(156, 39, 255, 0.3);
+
+  box-shadow:
+    var(--purple-glow),
+    0 8px 20px rgba(0, 0, 0, 0.5);
+
+  display: none;
+  flex-direction: column;
+
+  opacity: 0;
+  transform: translateY(-8px);
+
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  z-index: 20000;
+}
+
+.dropdown.show {
+  display: flex;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Dropdown items */
+.dropdown a,
+.dropdown button {
+  padding: 0.9rem 1.3rem;
+  text-align: left;
+
+  font-size: 1.03rem;
+  color: var(--cosmic-white);
+
+  background: transparent;
+  border: none;
+  text-decoration: none;
+
+  cursor: pointer;
+  transition: background 0.25s ease, color 0.25s ease;
+}
+
+.dropdown a:hover,
+.dropdown button:hover {
+  background: rgba(0,168,255,0.12);
+  color: var(--stardust-blue);
+  text-shadow: var(--blue-glow);
+}
+
+/* Separator line */
+.logout-btn {
+  border-top: 1px solid rgba(255,255,255,0.08);
+  margin-top: 0.3rem;
+  padding-top: 0.8rem;
+}
+
+/* ===========================
+      STAR PARTICLES BEHIND HEADER
+   =========================== */
+
+header::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 100%;
+
+  pointer-events: none;
+
+  background-image:
+    radial-gradient(circle, rgba(255,255,255,0.25) 2px, transparent 3px),
+    radial-gradient(circle, rgba(156,39,255,0.25) 2px, transparent 3px),
+    radial-gradient(circle, rgba(0,168,255,0.25) 2px, transparent 3px);
+
+  background-size:
+    180px 180px,
+    260px 260px,
+    340px 340px;
+
+  background-position:
+    20% 40%,
+    80% 70%,
+    50% 10%;
+
+  opacity: 0.12;
+  animation: starsFloat 25s ease-in-out infinite;
+}
+
+@keyframes starsFloat {
+  0% { transform: translateY(0); opacity: 0.1; }
+  50% { transform: translateY(15px); opacity: 0.17; }
+  100% { transform: translateY(0); opacity: 0.1; }
+}
+
+/* ===========================
+      DROPDOWN ARROW (subtle)
+   =========================== */
+
+.profile-menu::after {
+  content: "";
+  position: absolute;
+  right: 18px;
+  top: 55%;
+
+  width: 8px;
+  height: 8px;
+
+  border-right: 2px solid var(--stardust-blue);
+  border-bottom: 2px solid var(--stardust-blue);
+
+  transform: translateY(-50%) rotate(45deg);
+  opacity: 0.6;
+
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.profile-menu:hover::after {
+  transform: translateY(-50%) rotate(-135deg);
+  opacity: 1;
+}
+
+/* ===========================
+      RESPONSIVE DESIGN
+   =========================== */
+
+@media (max-width: 1200px) {
+  .header-center nav ul {
+    gap: 2rem;
+  }
+
+  .logo-text {
+    font-size: 2.3rem;
+  }
+}
+
+@media (max-width: 980px) {
+
+  header {
+    padding: 0 1.8rem;
+  }
+
+  .header-center {
+    display: none; /* hide mid navigation on tablets */
+  }
+
+  .search input {
+    width: 150px;
+  }
+
+  .search input:focus {
+    width: 210px;
+  }
+}
+
+@media (max-width: 680px) {
+
+  header {
+    height: 75px;
+  }
+
+  .logo-text {
+    font-size: 1.9rem;
+  }
+
+  .profile-avatar {
+    width: 40px;
+    height: 40px;
+  }
+
+  .btn-outline,
+  .btn-primary {
+    padding: 0.5rem 1.1rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+
+  header {
+    padding: 0 1.2rem;
+  }
+
+  .auth-buttons {
+    gap: 0.5rem;
+  }
+
+  .btn-outline,
+  .btn-primary {
+    padding: 0.45rem 1rem;
+    font-size: 0.8rem;
+  }
+
+  .search input {
+    width: 130px;
+  }
+
+  .search input:focus {
+    width: 170px;
+  }
+}
+
+/* ===========================
+      ANIMATIONS (FadeIn)
+   =========================== */
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,509 @@
+/* ============================================================
+   🌌 SERVER DOWN PAGE — COSMIC/HSR THEME WITH ANIMATIONS
+   ============================================================ */
+
+:root {
+    --stardust-blue: #00a8ff;
+    --nebula-purple: #9c27ff;
+    --supernova-red: #ff2d75;
+    --void-black: #0f0c1a;
+    --cosmic-white: #e0e0ff;
+}
+
+.server-down-container {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--void-black) 0%, #1a0a2a 50%, #0f0c1a 100%);
+    padding: 20px;
+}
+
+/* Animated background particles */
+.particles {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--stardust-blue);
+    border-radius: 50%;
+    opacity: 0.6;
+    animation: float-up linear infinite;
+    box-shadow: 0 0 10px var(--stardust-blue);
+}
+
+@keyframes float-up {
+    0% {
+        transform: translateY(100vh) translateX(0) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.6;
+    }
+    90% {
+        opacity: 0.6;
+    }
+    100% {
+        transform: translateY(-100px) translateX(50px) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Main content */
+.server-down-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 700px;
+    padding: 60px 40px;
+    background: rgba(15, 12, 26, 0.85);
+    border-radius: 30px;
+    border: 2px solid rgba(0, 168, 255, 0.3);
+    box-shadow: 
+        0 0 50px rgba(0, 168, 255, 0.3),
+        inset 0 0 30px rgba(156, 39, 255, 0.1);
+    backdrop-filter: blur(20px);
+    animation: fadeInScale 0.8s ease-out;
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Server icon animation */
+.server-down-icon {
+    margin-bottom: 40px;
+    display: flex;
+    justify-content: center;
+    animation: bounce 2s ease-in-out infinite;
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+.server-icon {
+    position: relative;
+    width: 120px;
+    height: 150px;
+}
+
+.server-screen {
+    width: 100px;
+    height: 80px;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    border: 3px solid var(--stardust-blue);
+    border-radius: 8px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+        0 0 20px rgba(0, 168, 255, 0.5),
+        inset 0 0 20px rgba(0, 0, 0, 0.5);
+    animation: screen-flicker 3s infinite;
+}
+
+@keyframes screen-flicker {
+    0%, 100% {
+        opacity: 1;
+        box-shadow: 
+            0 0 20px rgba(0, 168, 255, 0.5),
+            inset 0 0 20px rgba(0, 0, 0, 0.5);
+    }
+    50% {
+        opacity: 0.7;
+        box-shadow: 
+            0 0 10px rgba(0, 168, 255, 0.3),
+            inset 0 0 10px rgba(0, 0, 0, 0.3);
+    }
+}
+
+.screen-line {
+    position: absolute;
+    left: 10px;
+    right: 10px;
+    height: 2px;
+    background: var(--supernova-red);
+    box-shadow: 0 0 10px var(--supernova-red);
+    animation: scan-line 2s linear infinite;
+}
+
+.screen-line:nth-child(1) {
+    top: 20px;
+    animation-delay: 0s;
+}
+
+.screen-line:nth-child(2) {
+    top: 40px;
+    animation-delay: 0.7s;
+}
+
+.screen-line:nth-child(3) {
+    top: 60px;
+    animation-delay: 1.4s;
+}
+
+@keyframes scan-line {
+    0% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+}
+
+.server-base {
+    width: 120px;
+    height: 20px;
+    background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+    border: 2px solid var(--stardust-blue);
+    border-radius: 4px;
+    margin: 10px auto 0;
+    box-shadow: 0 0 15px rgba(0, 168, 255, 0.4);
+}
+
+.server-light {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 8px;
+    background: var(--supernova-red);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 10px var(--supernova-red),
+        0 0 20px var(--supernova-red);
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: translateX(-50%) scale(1.2);
+    }
+}
+
+/* Title with glitch effect */
+.server-down-title {
+    font-size: 3rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    color: var(--stardust-blue);
+    text-shadow: 
+        0 0 10px var(--stardust-blue),
+        0 0 20px var(--stardust-blue),
+        0 0 30px var(--stardust-blue);
+    animation: title-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes title-glow {
+    from {
+        text-shadow: 
+            0 0 10px var(--stardust-blue),
+            0 0 20px var(--stardust-blue),
+            0 0 30px var(--stardust-blue);
+    }
+    to {
+        text-shadow: 
+            0 0 20px var(--stardust-blue),
+            0 0 30px var(--stardust-blue),
+            0 0 40px var(--nebula-purple);
+    }
+}
+
+.glitch {
+    position: relative;
+    display: inline-block;
+}
+
+.glitch::before,
+.glitch::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.glitch::before {
+    left: 2px;
+    text-shadow: -2px 0 var(--supernova-red);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+}
+
+.glitch::after {
+    left: -2px;
+    text-shadow: -2px 0 var(--nebula-purple), 2px 2px var(--supernova-red);
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 1s infinite linear alternate-reverse;
+}
+
+@keyframes glitch-anim {
+    0% {
+        clip: rect(31px, 9999px, 94px, 0);
+    }
+    20% {
+        clip: rect(33px, 9999px, 14px, 0);
+    }
+    40% {
+        clip: rect(43px, 9999px, 37px, 0);
+    }
+    60% {
+        clip: rect(12px, 9999px, 13px, 0);
+    }
+    80% {
+        clip: rect(98px, 9999px, 53px, 0);
+    }
+    100% {
+        clip: rect(8px, 9999px, 83px, 0);
+    }
+}
+
+/* Subtitle */
+.server-down-subtitle {
+    font-size: 1.3rem;
+    color: var(--cosmic-white);
+    margin-bottom: 40px;
+    opacity: 0.9;
+    animation: fadeIn 1s ease-out 0.3s both;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 0.9;
+        transform: translateY(0);
+    }
+}
+
+/* Details */
+.server-down-details {
+    margin: 40px 0;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: rgba(0, 168, 255, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    color: var(--cosmic-white);
+    font-size: 1rem;
+    animation: slideInLeft 0.6s ease-out both;
+}
+
+.detail-item:nth-child(1) {
+    animation-delay: 0.5s;
+}
+
+.detail-item:nth-child(2) {
+    animation-delay: 0.7s;
+}
+
+.detail-item:nth-child(3) {
+    animation-delay: 0.9s;
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.detail-icon {
+    font-size: 1.5rem;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+/* Action buttons */
+.server-down-actions {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.retry-btn,
+.home-btn {
+    padding: 15px 35px;
+    border-radius: 12px;
+    font-size: 1.1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    overflow: hidden;
+}
+
+.retry-btn {
+    background: linear-gradient(135deg, var(--stardust-blue), var(--nebula-purple));
+    color: var(--cosmic-white);
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.4);
+}
+
+.retry-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 
+        0 0 30px rgba(0, 168, 255, 0.6),
+        0 0 50px rgba(156, 39, 255, 0.4);
+}
+
+.retry-btn:active {
+    transform: translateY(-1px);
+}
+
+.retry-btn::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.retry-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.home-btn {
+    background: rgba(0, 168, 255, 0.1);
+    color: var(--stardust-blue);
+    border: 2px solid var(--stardust-blue);
+}
+
+.home-btn:hover {
+    background: rgba(0, 168, 255, 0.2);
+    box-shadow: 0 0 20px rgba(0, 168, 255, 0.4);
+    transform: translateY(-3px);
+}
+
+.retry-icon,
+.home-icon {
+    font-size: 1.3rem;
+    animation: rotate 2s linear infinite;
+}
+
+@keyframes rotate {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.home-icon {
+    animation: none;
+}
+
+/* Footer */
+.server-down-footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(0, 168, 255, 0.2);
+    color: var(--cosmic-white);
+    opacity: 0.7;
+    font-size: 0.9rem;
+    animation: fadeIn 1s ease-out 1s both;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .server-down-content {
+        padding: 40px 20px;
+    }
+
+    .server-down-title {
+        font-size: 2rem;
+    }
+
+    .server-down-subtitle {
+        font-size: 1.1rem;
+    }
+
+    .server-down-actions {
+        flex-direction: column;
+    }
+
+    .retry-btn,
+    .home-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .server-icon {
+        width: 100px;
+        height: 130px;
+    }
+
+    .server-screen {
+        width: 80px;
+        height: 60px;
+    }
+}
+
+/* Loading animation for retry */
+.retry-btn:active .retry-icon {
+    animation: rotate 0.5s linear infinite;
+}
+

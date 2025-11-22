@@ -1,0 +1,201 @@
+ /* ===== TOP AIRING PAGE STYLES ===== */
+.container {
+    max-width: 1400px;
+    margin: 120px auto 50px;
+    padding: 0 20px;
+    position: relative;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 50px;
+    position: relative;
+    margin-top: 150px; /* Добавяне на разстояние отгоре */
+}
+
+.page-header h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    background: linear-gradient(90deg, var(--stardust-blue), var(--supernova-red));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    display: inline-block;
+}
+
+.page-header p {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+    opacity: 0.8;
+}
+
+
+/* Anime Grid */
+#anime-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.anime-card {
+    position: relative;
+    overflow: hidden;
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    background: rgba(15, 12, 26, 0.7);
+    border: 1px solid rgba(156, 39, 255, 0.2);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.anime-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--stardust-blue);
+    box-shadow: 0 15px 30px rgba(0, 168, 255, 0.3);
+}
+
+.anime-banner {
+    position: relative;
+    height: 350px;
+    overflow: hidden;
+}
+
+.anime-banner img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.anime-card:hover .anime-banner img {
+    transform: scale(1.05);
+}
+
+.anime-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--supernova-red);
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    box-shadow: var(--red-glow);
+}
+
+.anime-content {
+    padding: 20px;
+    text-align: center;
+}
+
+.anime-title {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.anime-details {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    flex-wrap: wrap;
+}
+
+.anime-detail {
+    background: rgba(156, 39, 255, 0.1);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+.anime-duration {
+    color: var(--stardust-blue);
+}
+
+.anime-type {
+    color: var(--nebula-purple);
+}
+
+.anime-rating {
+    color: var(--cosmic-white);
+    background: rgba(0, 168, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    display: inline-block;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 50px;
+}
+
+.page-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: rgba(0, 168, 255, 0.1);
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    color: var(--cosmic-white);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.page-btn:hover, .page-btn.active {
+    background: var(--stardust-blue);
+    border-color: var(--stardust-blue);
+    box-shadow: var(--blue-glow);
+}
+
+/* Loading Animation */
+.loading-spinner {
+    display: none;
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(156, 39, 255, 0.2);
+    border-radius: 50%;
+    border-top-color: var(--nebula-purple);
+    animation: spin 1s ease-in-out infinite;
+    margin: 50px auto;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .container {
+        margin-top: 80px;
+    }
+    
+    .page-header h1 {
+        font-size: 2.5rem;
+    }
+    
+    #anime-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .anime-banner {
+        height: 280px;
+    }
+}
+
+@media (max-width: 480px) {
+    #anime-grid {
+        grid-template-columns: 1fr;
+    }
+}

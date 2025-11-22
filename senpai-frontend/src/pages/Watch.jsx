@@ -5,9 +5,6 @@ import { authFetch } from "../utils/authFetch";
 import { useAuth } from "../hooks/useAuth";
 import { redirectToServerDown } from "../utils/serverDownRedirect";
 
-/* ============================
-   Safe fetch
-=============================== */
 async function safeFetch(url, options = {}) {
     try {
         const res = await fetch(url, options);
@@ -43,7 +40,6 @@ export default function Watch() {
         return <div className="error">❌ Това аниме не е налично.</div>;
     }
 
-    /* --- STATE --- */
     const [episodes, setEpisodes] = useState([]);
     const [episodeNumber, setEpisodeNumber] = useState(episodeNumberFromUrl);
     const [episodeBackendId, setEpisodeBackendId] = useState(null);
@@ -57,7 +53,6 @@ export default function Watch() {
     const [videoSrc, setVideoSrc] = useState(null);
     const [videoLoading, setVideoLoading] = useState(false);
 
-    // SUBTITLES
     const [tracksSrc, setTracksSrc] = useState(null);
     const [subsReady, setSubsReady] = useState(false);
     const [subsLoading, setSubsLoading] = useState(false);
@@ -66,7 +61,6 @@ export default function Watch() {
     const [showUpgradeModal, setShowUpgradeModal] = useState(false);
     const [subsLoginPrompt, setSubsLoginPrompt] = useState(false);
 
-    // COMMENTS
     const [commentsData, setCommentsData] = useState(null);
     const [comments, setComments] = useState([]);
     const [myComments, setMyComments] = useState([]);
@@ -77,7 +71,6 @@ export default function Watch() {
     const [currentUser, setCurrentUser] = useState(null); // from the backend DTO
 
 
-    // MENU + EDIT STATES
     const [openMenuId, setOpenMenuId] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState("");
@@ -299,13 +292,11 @@ export default function Watch() {
 
             const newSessionId = sessionId;
 
-            // kill previous session (if changed)
             const oldSessionId = sessionStorage.getItem("watch_sessionId");
             if (oldSessionId && oldSessionId !== newSessionId) {
                 killSession(oldSessionId);
             }
 
-            // 3) Convert video
             const convRes = await safeFetch(
                 "http://localhost:8080/api/v1/episode/video",
                 {
@@ -330,7 +321,6 @@ export default function Watch() {
                 return;
             }
 
-            // SUCCESS
             setVideoSrc(
                 `http://localhost:8081/api/v1/streaming?vidName=${newSessionId}`
             );
@@ -367,9 +357,6 @@ export default function Watch() {
     setCurrentUser(null);
 }, [episodeNumber]);
 
-    /* ============================
-       Load Comments
-    ============================ */
     useEffect(() => {
     async function loadComments() {
         if (!episodeBackendId) return;   // <--- ВАЖНО!
@@ -573,9 +560,6 @@ async function handleDeleteComment(id) {
 
 
 
-    /* ============================
-       Favorites
-    ============================ */
     async function handleToggleFavorite() {
         if (!isLoggedIn) {
             setFavoriteLoginPrompt(true);
@@ -717,9 +701,6 @@ async function handleDeleteComment(id) {
         }
     }
 
-    /* ============================
-       Subtitles
-    ============================ */
     async function handleSubtitles() {
         if (!videoSrc) return;
 
@@ -728,8 +709,7 @@ async function handleDeleteComment(id) {
             return;
         }
 
-        // Check if user is logged in
-        if (!isLoggedIn) {
+            if (!isLoggedIn) {
             setSubsLoginPrompt(true);
             return;
         }
@@ -829,16 +809,10 @@ async function handleDeleteComment(id) {
         setSubsError(null);
     }
 
-    /* ============================
-       UI
-    ============================ */
     return (
     <div className="watch-page">
 
-        {/* FIRST ROW — VIDEO + EPISODES */}
         <div className="top-row">
-
-            {/* VIDEO */}
             <div className="video-container">
                 <div className="video-wrapper-container">
                 <div className="video-wrapper">
@@ -887,10 +861,8 @@ async function handleDeleteComment(id) {
                 </div>
                 </div>
 
-                {/* SUBTITLES & FAVORITE BUTTONS - ПОД ВИДЕОТО */}
                 {isPlaying && (
                     <div className="video-controls-bottom">
-                        {/* SUBTITLES BUTTON */}
                         <div className="subs-control">
                             {subsLoginPrompt ? (
                                 <div className="subs-login-prompt">
@@ -926,7 +898,6 @@ async function handleDeleteComment(id) {
                             )}
                         </div>
 
-                        {/* FAVORITE BUTTON */}
                         <div className="favorite-control">
                             {favoriteLoginPrompt ? (
                                 <div className="favorite-login-prompt">
@@ -962,7 +933,6 @@ async function handleDeleteComment(id) {
                 )}
             </div>
 
-            {/* EPISODES */}
             <div className="episodes-panel">
                 <h3>List of Episodes</h3>
 
@@ -998,7 +968,6 @@ async function handleDeleteComment(id) {
             </div>
         </div>
 
-        {/* SECOND ROW — COMMENTS */}
         <div className="comments-wrapper">
             <h3 className="comments-title">Коментари</h3>
 

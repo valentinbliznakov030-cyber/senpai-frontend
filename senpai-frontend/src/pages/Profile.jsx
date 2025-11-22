@@ -7,9 +7,6 @@ import { redirectToServerDown } from "../utils/serverDownRedirect";
 import { authFetch } from "../utils/authFetch";
 import { useAuth } from "../hooks/useAuth";
 
-/* =====================================================
-   safeFetch — helper за неавтентифицирани заявки
-===================================================== */
 async function safeFetch(url, options = {}) {
   try {
     const res = await fetch(url, options);
@@ -34,10 +31,7 @@ async function safeFetch(url, options = {}) {
 
 const Profile = () => {
 
-  // 🟣 ВЗИМАМЕ user И setUser ОТ AUTH PROVIDER
   const { user: authUser, setUser: setAuthUser, logout } = useAuth();
-
-  // 🟣 ЛОКАЛНО СЪСТОЯНИЕ — първоначално копираме authUser
   const [user, setUser] = useState(authUser);
 
   const [favorites, setFavorites] = useState([]);
@@ -47,7 +41,6 @@ const Profile = () => {
   const [loadingFav, setLoadingFav] = useState(true);
   const [loadingHistory, setLoadingHistory] = useState(true);
 
-  // EDIT PANEL
   const [isEditing, setIsEditing] = useState(false);
   const [editForm, setEditForm] = useState({
     username: authUser?.username || "",
@@ -55,12 +48,10 @@ const Profile = () => {
   });
   const [editMessage, setEditMessage] = useState("");
 
-  // PROFILE PICTURE
   const [pfpFile, setPfpFile] = useState(null);
   const [pfpPreview, setPfpPreview] = useState(null);
   const [pfpMessage, setPfpMessage] = useState("");
 
-  // 🟣 LOAD USER DATA (винаги дърпаме най-ново)
   useEffect(() => {
     const fetchUser = async () => {
       const resp = await authFetch("http://localhost:8080/api/v1/member/me");
@@ -68,8 +59,8 @@ const Profile = () => {
       if (resp.ok) {
         const data = await resp.json();
 
-        setUser(data);          // локален профил
-        setAuthUser(data);      // 🟣 ОБНОВЯВАМЕ AUTH PROVIDER
+        setUser(data);
+        setAuthUser(data);
 
         setEditForm({
           username: data.username,
@@ -83,7 +74,6 @@ const Profile = () => {
     fetchUser();
   }, []);
 
-  // 🟣 Helper → fetch anime by hiAnimeId
   const fetchAnimeByHiAnimeId = async (hiAnimeId) => {
     if (!hiAnimeId) return null;
     
@@ -94,7 +84,6 @@ const Profile = () => {
     return result.data.data;
   };
 
-  // 🟣 LOAD FAVORITES
   useEffect(() => {
     const loadFavorites = async () => {
       const resp = await authFetch(
@@ -131,7 +120,6 @@ const Profile = () => {
     loadFavorites();
   }, []);
 
-  // 🟣 LOAD HISTORY
   useEffect(() => {
     const loadHistory = async () => {
       const resp = await authFetch(
@@ -144,7 +132,6 @@ const Profile = () => {
 
         const mapped = await Promise.all(
           list.map(async (h) => {
-            // Fetch anime details by hiAnimeId
             const animeData = await fetchAnimeByHiAnimeId(h.hiAnimeId);
             if (!animeData) return null;
 
@@ -170,12 +157,10 @@ const Profile = () => {
     loadHistory();
   }, []);
 
-  // 🔧 Edit form
   const handleEditChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
 
-  // 🔧 SAVE profile edits
   const handleSaveEdit = async () => {
     setEditMessage("");
 
@@ -206,27 +191,22 @@ const Profile = () => {
       setEditMessage("✔ Промените са запазени!");
       setIsEditing(false);
 
-      // 🟣 ОБНОВЯВАМЕ локалния user
       const updated = {
         ...user,
         username: editForm.username,
         email: editForm.email,
       };
       setUser(updated);
-
-      // 🟣 ОБНОВЯВАМЕ AuthProvider user
       setAuthUser(updated);
     }
   };
 
-  // 🔧 Profile picture select
   const handlePfpSelect = (e) => {
     const file = e.target.files[0];
     setPfpFile(file);
     setPfpPreview(URL.createObjectURL(file));
   };
 
-  // 🔧 Upload picture
   const handleUploadPfp = async () => {
     if (!pfpFile) return;
 
@@ -249,11 +229,7 @@ const Profile = () => {
       setPfpMessage("✔ Снимката е качена!");
 
       const updated = { ...user, profilePictureUrl: url };
-
-      // 🟣 локално
       setUser(updated);
-
-      // 🟣 в AuthProvider → Header ще се обнови
       setAuthUser(updated);
     } else {
       setPfpMessage("❌ Грешка при качване.");
@@ -267,7 +243,6 @@ const Profile = () => {
         <p>Информация, редакция, снимка, любими анимета и история</p>
       </div>
 
-      {/* USER HEADER */}
       <div className="profile-header">
         <div className="pfp-wrapper">
           <img
@@ -310,7 +285,6 @@ const Profile = () => {
         </div>
       </div>
 
-      {/* EDIT PANEL */}
       {isEditing && (
         <div className="edit-panel">
 
@@ -379,7 +353,6 @@ const Profile = () => {
         </div>
       )}
 
-      {/* FAVORITES */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h2 className="profile-section-title" style={{ margin: 0 }}>Любими анимета</h2>
         {favorites.length > 0 && (
@@ -431,7 +404,6 @@ const Profile = () => {
         )}
       </div>
 
-      {/* HISTORY */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", marginTop: "40px" }}>
         <h2 className="profile-section-title" style={{ margin: 0 }}>Последно гледани</h2>
         {history.length > 0 && (

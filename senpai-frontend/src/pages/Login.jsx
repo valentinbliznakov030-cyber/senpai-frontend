@@ -14,6 +14,7 @@ const Login = () => {
   });
 
   const [error, setError] = useState("");
+  const [isBanned, setIsBanned] = useState(false); // Флаг за баннат потребител
   const [fieldErrors, setFieldErrors] = useState({}); // Грешки по полета
   const [success, setSuccess] = useState(false);
 
@@ -24,6 +25,7 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setIsBanned(false);
     setFieldErrors({}); // Изчистваме полевите грешки
 
     try {
@@ -46,6 +48,14 @@ const Login = () => {
         }, 600);
 
       } else {
+        // Проверка за 403 Forbidden (баннат потребител)
+        if (resp.status === 403) {
+          const banMessage = data?.message || data?.error || "Твоят акаунт е баннат.";
+          setError(`🚫 ${banMessage}`);
+          setIsBanned(true);
+          return;
+        }
+        
         // Проверка за валидационни грешки (400 Bad Request)
         if (resp.status === 400 && data && typeof data === 'object') {
           // Валидационните грешки са Map<String, String> където ключът е полето
@@ -126,7 +136,7 @@ const Login = () => {
             <a href="/forgot-password">Забравена парола?</a>
           </p>
 
-          {error && <p className="error">{error}</p>}
+          {error && <p className={`error ${isBanned ? "banned-error" : ""}`}>{error}</p>}
           {success && <p className="success">✔ Успешен вход!</p>}
 
           <button type="submit" className="btn btn-primary">

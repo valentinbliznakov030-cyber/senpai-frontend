@@ -23,6 +23,9 @@ import Admin from "./pages/Admin";
 import NotFound from "./pages/404";
 import ForgotPassword from "./pages/ForgotPassword";
 import Plans from "./pages/Plans";
+import WatchHistory from "./pages/WatchHistory";
+import Favourites from "./pages/Favourites";
+import AboutUs from "./pages/AboutUs";
 
 function AppShell() {
   const location = useLocation();
@@ -55,6 +58,7 @@ function AppShell() {
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/error-code" element={<ServerDown />} />
         <Route path="/watch" element={<Watch />} />
+        <Route path="/about-us" element={<AboutUs />} />
         {/* Protected Page */}
         <Route
           path="/profile"
@@ -77,6 +81,22 @@ function AppShell() {
           element={
             <ProtectedRoute>
               <Plans />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/watch-history"
+          element={
+            <ProtectedRoute>
+              <WatchHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favourites"
+          element={
+            <ProtectedRoute>
+              <Favourites />
             </ProtectedRoute>
           }
         />

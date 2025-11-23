@@ -102,11 +102,12 @@ const fetchSuggestions = async (searchQuery) => {
       {/* CENTER */}
       <div className="header-center">
         <nav>
-          <ul>
-            <li><Link to="/">Начало</Link></li>
-            <li><Link to="/top-airing">Top Airing</Link></li>
-            <li><Link to="/most-popular">Most Popular</Link></li>
-          </ul>
+          <ul>
+            <li><Link to="/">Начало</Link></li>
+            <li><Link to="/top-airing">Top Airing</Link></li>
+            <li><Link to="/most-popular">Most Popular</Link></li>
+            <li><Link to="/about-us">За нас</Link></li>
+          </ul>
         </nav>
       </div>
 

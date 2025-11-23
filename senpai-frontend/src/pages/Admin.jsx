@@ -41,17 +41,20 @@ export default function Admin() {
     });
 
     // Inline editing state for members - whole row editing
-    const [editingMemberId, setEditingMemberId] = useState(null);
-    const [memberEditValues, setMemberEditValues] = useState({});
-    const [memberPfpFile, setMemberPfpFile] = useState(null);
-    const [memberPfpPreview, setMemberPfpPreview] = useState(null);
+    // Use objects keyed by member ID to track editing state per member
+    const [editingMemberIds, setEditingMemberIds] = useState(new Set());
+    const [memberEditValues, setMemberEditValues] = useState({}); // { memberId: { username, email, role, active } }
+    const [memberPfpFiles, setMemberPfpFiles] = useState({}); // { memberId: file }
+    const [memberPfpPreviews, setMemberPfpPreviews] = useState({}); // { memberId: previewUrl }
     const [memberPfpUploading, setMemberPfpUploading] = useState(null);
-    const [memberPfpError, setMemberPfpError] = useState(null);
-    const [memberError, setMemberError] = useState(null);
+    const [memberSaving, setMemberSaving] = useState(null); // memberId that is currently being saved
+    const [memberPfpErrors, setMemberPfpErrors] = useState({}); // { memberId: errorMessage }
+    const [memberErrors, setMemberErrors] = useState({}); // { memberId: errorMessage }
 
     // Inline editing state for comments - whole row editing
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [commentEditValue, setCommentEditValue] = useState("");
+    const [commentSaving, setCommentSaving] = useState(null); // commentId that is currently being saved
     const [commentError, setCommentError] = useState(null);
 
     // Check if user is admin
@@ -95,9 +98,40 @@ export default function Admin() {
                                 } else if (Array.isArray(data?.members)) {
                                     membersList = data.members;
                                 }
-                                setMembers(membersList);
+                                
+                                // Normalize member data - ensure id field exists
+                                // First, try to get IDs for members without ID
+                                const membersWithIds = await Promise.all(
+                                    membersList.map(async (member) => {
+                                        // Backend returns memberId in MemberResponseDto
+                                        let id = member.memberId || member.id || member.uuid || member.userId || null;
+                                        
+                                        // If no ID found, try to extract from profilePictureUrl (fallback)
+                                        if (!id && member.profilePictureUrl) {
+                                            // URL format: http://localhost:8080/profile-pictures/{memberId}_{filename}
+                                            const urlMatch = member.profilePictureUrl.match(/profile-pictures\/([a-f0-9-]{36})_/);
+                                            if (urlMatch && urlMatch[1]) {
+                                                id = urlMatch[1];
+                                            }
+                                        }
+                                        
+                                        if (!id) {
+                                            console.error("Member missing ID field:", member);
+                                            return null; // Filter out members without ID
+                                        }
+                                        return {
+                                            ...member,
+                                            id: id, // Normalize to 'id' for consistency
+                                            memberId: id // Keep memberId as well
+                                        };
+                                    })
+                                );
+                                
+                                const normalizedMembers = membersWithIds.filter(member => member !== null);
+                                
+                                setMembers(normalizedMembers);
                                 setMembersTotalPages(0);
-                                setMembersTotalElements(membersList.length);
+                                setMembersTotalElements(normalizedMembers.length);
                             } catch (parseError) {
                                 console.error("Error parsing members JSON:", parseError);
                                 setMembers([]);
@@ -141,9 +175,40 @@ export default function Admin() {
                                 if (membersList.length > 0) {
                                     console.log("First member loaded:", membersList[0]);
                                     console.log("First member ID:", membersList[0].id);
+                                    console.log("First member keys:", Object.keys(membersList[0]));
                                 }
                                 
-                                setMembers(membersList);
+                                // Normalize member data - ensure id field exists
+                                // First, try to get IDs for members without ID
+                                const membersWithIds = await Promise.all(
+                                    membersList.map(async (member) => {
+                                        // Backend returns memberId in MemberResponseDto
+                                        let id = member.memberId || member.id || member.uuid || member.userId || null;
+                                        
+                                        // If no ID found, try to extract from profilePictureUrl (fallback)
+                                        if (!id && member.profilePictureUrl) {
+                                            // URL format: http://localhost:8080/profile-pictures/{memberId}_{filename}
+                                            const urlMatch = member.profilePictureUrl.match(/profile-pictures\/([a-f0-9-]{36})_/);
+                                            if (urlMatch && urlMatch[1]) {
+                                                id = urlMatch[1];
+                                            }
+                                        }
+                                        
+                                        if (!id) {
+                                            console.error("Member missing ID field:", member);
+                                            return null; // Filter out members without ID
+                                        }
+                                        return {
+                                            ...member,
+                                            id: id, // Normalize to 'id' for consistency
+                                            memberId: id // Keep memberId as well
+                                        };
+                                    })
+                                );
+                                
+                                const normalizedMembers = membersWithIds.filter(member => member !== null);
+                                
+                                setMembers(normalizedMembers);
                             } catch (parseError) {
                                 console.error("Error parsing members JSON:", parseError);
                                 console.error("Response text:", text);
@@ -312,27 +377,98 @@ export default function Admin() {
 
     // Start editing a member row (clicking any field activates edit mode for whole row)
     function startEditingMember(member) {
-        setEditingMemberId(member.id);
-        setMemberEditValues({
-            username: member.username || "",
-            email: member.email || "",
-            active: member.active !== undefined ? member.active : true,
-            role: member.role || "USER"
+        // Backend returns memberId in MemberResponseDto
+        const memberId = member.memberId || member.id || member.uuid || member.userId;
+        
+        if (!memberId) {
+            console.error("Member ID is missing:", member);
+            console.error("Available keys:", Object.keys(member));
+            alert("Грешка: Този член няма валиден ID и не може да бъде редактиран.");
+            return;
+        }
+        
+        // Validate that ID is a valid UUID format (not temp-*)
+        const idString = memberId.toString();
+        if (idString.startsWith('temp-')) {
+            console.error("Member has temporary ID, cannot edit:", member);
+            alert("Грешка: Този член няма валиден ID и не може да бъде редактиран.");
+            return;
+        }
+        setEditingMemberIds(prev => new Set(prev).add(memberId));
+        setMemberEditValues(prev => ({
+            ...prev,
+            [memberId]: {
+                username: member.username || "",
+                email: member.email || "",
+                active: member.active !== undefined ? member.active : true,
+                role: member.role || "USER"
+            }
+        }));
+        setMemberPfpFiles(prev => {
+            const newState = { ...prev };
+            delete newState[memberId];
+            return newState;
         });
-        setMemberPfpFile(null);
-        setMemberPfpPreview(null);
-        setMemberPfpError(null);
-        setMemberError(null);
+        setMemberPfpPreviews(prev => {
+            const newState = { ...prev };
+            delete newState[memberId];
+            return newState;
+        });
+        setMemberPfpErrors(prev => {
+            const newState = { ...prev };
+            delete newState[memberId];
+            return newState;
+        });
+        setMemberErrors(prev => {
+            const newState = { ...prev };
+            delete newState[memberId];
+            return newState;
+        });
     }
 
     // Cancel editing member
-    function cancelEditingMember() {
-        setEditingMemberId(null);
-        setMemberEditValues({});
-        setMemberPfpFile(null);
-        setMemberPfpPreview(null);
-        setMemberPfpError(null);
-        setMemberError(null);
+    function cancelEditingMember(memberId) {
+        if (!memberId) {
+            // Cancel all if no ID provided
+            setEditingMemberIds(new Set());
+            setMemberEditValues({});
+            setMemberPfpFiles({});
+            setMemberPfpPreviews({});
+            setMemberPfpErrors({});
+            setMemberErrors({});
+            return;
+        }
+        const idString = memberId.toString();
+        setEditingMemberIds(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(idString);
+            return newSet;
+        });
+        setMemberEditValues(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
+        setMemberPfpFiles(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
+        setMemberPfpPreviews(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
+        setMemberPfpErrors(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
+        setMemberErrors(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
     }
 
     // Save member changes (all fields at once)
@@ -348,6 +484,12 @@ export default function Admin() {
             throw new Error("Невалиден Member ID");
         }
 
+        // Get edit values for this specific member
+        const editValues = memberEditValues[idString];
+        if (!editValues) {
+            throw new Error("Няма данни за редактиране за този член");
+        }
+
         try {
             // Build update DTO with ALL fields from the row
             const updateDto = {
@@ -356,17 +498,17 @@ export default function Admin() {
 
             // Always include all fields (even if not changed) to ensure complete update
             // Only include fields that have actual values
-            if (memberEditValues.username !== undefined && memberEditValues.username !== "") {
-                updateDto.username = memberEditValues.username;
+            if (editValues.username !== undefined && editValues.username !== "") {
+                updateDto.username = editValues.username;
             }
-            if (memberEditValues.email !== undefined && memberEditValues.email !== "") {
-                updateDto.email = memberEditValues.email;
+            if (editValues.email !== undefined && editValues.email !== "") {
+                updateDto.email = editValues.email;
             }
-            if (memberEditValues.active !== undefined) {
-                updateDto.active = memberEditValues.active;
+            if (editValues.active !== undefined) {
+                updateDto.active = editValues.active;
             }
-            if (memberEditValues.role !== undefined && memberEditValues.role !== "") {
-                updateDto.role = memberEditValues.role;
+            if (editValues.role !== undefined && editValues.role !== "") {
+                updateDto.role = editValues.role;
             }
 
             console.log("Sending update DTO:", updateDto);
@@ -393,11 +535,26 @@ export default function Admin() {
 
     // Handle profile picture selection
     function handleMemberPfpSelect(e, memberId) {
+        if (!memberId) {
+            console.error("Member ID is missing in handleMemberPfpSelect");
+            return;
+        }
+        const idString = memberId.toString();
         const file = e.target.files[0];
         if (file) {
-            setMemberPfpFile({ memberId, file });
-            setMemberPfpPreview({ memberId, preview: URL.createObjectURL(file) });
-            setMemberPfpError(null);
+            setMemberPfpFiles(prev => ({
+                ...prev,
+                [idString]: file
+            }));
+            setMemberPfpPreviews(prev => ({
+                ...prev,
+                [idString]: URL.createObjectURL(file)
+            }));
+            setMemberPfpErrors(prev => {
+                const newState = { ...prev };
+                delete newState[idString];
+                return newState;
+            });
         }
     }
 
@@ -405,26 +562,45 @@ export default function Admin() {
     async function saveMemberRow(memberId) {
         // Validate memberId
         if (!memberId) {
-            setMemberError("Грешка: Липсва ID на член");
+            setMemberErrors(prev => ({
+                ...prev,
+                [memberId?.toString() || 'unknown']: "Грешка: Липсва ID на член"
+            }));
             return;
         }
 
         // Convert to string if it's not already
         const idString = typeof memberId === 'string' ? memberId : memberId.toString();
         
-        if (!idString || idString === 'undefined' || idString === 'null') {
-            setMemberError("Грешка: Невалиден ID на член");
+        if (!idString || idString === 'undefined' || idString === 'null' || idString.startsWith('temp-')) {
+            const errorMsg = idString.startsWith('temp-') 
+                ? "Грешка: Този член няма валиден ID и не може да бъде редактиран."
+                : "Грешка: Невалиден ID на член";
+            setMemberErrors(prev => ({
+                ...prev,
+                [idString]: errorMsg
+            }));
             return;
         }
 
-        setMemberError(null);
-        setMemberPfpError(null);
+        // Set loading state
+        setMemberSaving(idString);
+        setMemberErrors(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
+        setMemberPfpErrors(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
         try {
             const promises = [];
 
             // 1. Upload profile picture if selected
-            if (memberPfpFile && memberPfpFile.memberId === memberId) {
-                promises.push(uploadMemberPfp(memberId));
+            if (memberPfpFiles[idString]) {
+                promises.push(uploadMemberPfp(idString));
             }
             
             // 2. Save all other field changes (username, email, role, active)
@@ -492,28 +668,41 @@ export default function Admin() {
                 }
             }
 
-            cancelEditingMember();
+            cancelEditingMember(idString);
         } catch (error) {
             console.error("Error saving member row:", error);
             const errorMessage = error.message || "Грешка при запазване на промените";
             if (error.isPfpError) {
-                setMemberPfpError(errorMessage);
+                setMemberPfpErrors(prev => ({
+                    ...prev,
+                    [idString]: errorMessage
+                }));
             } else {
-                setMemberError(errorMessage);
+                setMemberErrors(prev => ({
+                    ...prev,
+                    [idString]: errorMessage
+                }));
             }
+        } finally {
+            setMemberSaving(null);
         }
     }
 
     // Upload profile picture
     async function uploadMemberPfp(memberId) {
-        const pfpData = memberPfpFile;
-        if (!pfpData || pfpData.memberId !== memberId) return;
+        const idString = typeof memberId === 'string' ? memberId : memberId.toString();
+        const pfpFile = memberPfpFiles[idString];
+        if (!pfpFile) return;
 
-        setMemberPfpUploading(memberId);
-        setMemberPfpError(null);
+        setMemberPfpUploading(idString);
+        setMemberPfpErrors(prev => {
+            const newState = { ...prev };
+            delete newState[idString];
+            return newState;
+        });
         try {
             // First, delete old picture if exists
-            const member = members.find(m => m.id === memberId);
+            const member = members.find(m => m.id?.toString() === idString);
             if (member?.profilePictureUrl) {
                 // Extract image name from URL
                 // URL format: http://localhost:8080/profile-pictures/{memberId}_{originalFilename}
@@ -525,13 +714,13 @@ export default function Admin() {
                         // Extract just the imageName part (without memberId prefix)
                         // File format: {memberId}_{originalFilename}
                         // We need to extract {originalFilename} part
-                        const fileNameWithoutPrefix = fullFileName.startsWith(memberId + "_") 
-                            ? fullFileName.substring(memberId.toString().length + 1) 
+                        const fileNameWithoutPrefix = fullFileName.startsWith(idString + "_") 
+                            ? fullFileName.substring(idString.length + 1) 
                             : fullFileName;
 
                         // Use admin endpoint to delete
                         const deleteRes = await authFetch(
-                            `http://localhost:8080/api/v1/admin/profilePicture/${memberId}/${fileNameWithoutPrefix}`,
+                            `http://localhost:8080/api/v1/admin/profilePicture/${idString}/${fileNameWithoutPrefix}`,
                             {
                                 method: "DELETE"
                             }
@@ -549,11 +738,11 @@ export default function Admin() {
             }
 
             const formData = new FormData();
-            formData.append("file", pfpData.file);
+            formData.append("file", pfpFile);
 
             // Use admin endpoint to upload
             const res = await authFetch(
-                `http://localhost:8080/api/v1/admin/profilePicture/${memberId}`,
+                `http://localhost:8080/api/v1/admin/profilePicture/${idString}`,
                 {
                     method: "POST",
                     body: formData
@@ -563,10 +752,25 @@ export default function Admin() {
             if (res.ok) {
                 // Picture uploaded successfully
                 // Members will be reloaded by saveMemberRow after all changes are saved
-                setMemberPfpFile(null);
-                setMemberPfpPreview(null);
+                setMemberPfpFiles(prev => {
+                    const newState = { ...prev };
+                    delete newState[idString];
+                    return newState;
+                });
+                setMemberPfpPreviews(prev => {
+                    const newState = { ...prev };
+                    if (newState[idString]) {
+                        URL.revokeObjectURL(newState[idString]);
+                    }
+                    delete newState[idString];
+                    return newState;
+                });
                 setMemberPfpUploading(null);
-                setMemberPfpError(null);
+                setMemberPfpErrors(prev => {
+                    const newState = { ...prev };
+                    delete newState[idString];
+                    return newState;
+                });
             } else {
                 const errorText = await res.text();
                 console.error("Error uploading picture:", errorText);
@@ -613,6 +817,8 @@ export default function Admin() {
             return;
         }
 
+        const commentIdString = commentId.toString();
+        setCommentSaving(commentIdString);
         setCommentError(null);
         try {
             const updateDto = {
@@ -837,12 +1043,19 @@ export default function Admin() {
                                                     <td colSpan="7" className="no-data">Няма данни</td>
                                                 </tr>
                                             ) : (
-                                                members.map((member) => (
-                                                    <React.Fragment key={member.id}>
+                                                members.map((member, index) => {
+                                                    // Use normalized id (which is set from memberId during normalization)
+                                                    const memberId = (member.id || member.memberId)?.toString();
+                                                    if (!memberId || memberId.startsWith('temp-')) {
+                                                        console.warn("Skipping member without valid ID:", member);
+                                                        return null;
+                                                    }
+                                                    return (
+                                                    <React.Fragment key={memberId}>
                                                         <tr 
-                                                            className={editingMemberId === member.id ? "row-editing" : ""}
+                                                            className={editingMemberIds.has(memberId) ? "row-editing" : ""}
                                                         >
-                                                            <td className="id-cell">{member.id?.toString().substring(0, 8)}...</td>
+                                                            <td className="id-cell">{(memberId || "N/A").substring(0, 8)}...</td>
                                                             <td>
                                                                 <div className="member-pfp-cell">
                                                                     <img
@@ -850,17 +1063,17 @@ export default function Admin() {
                                                                         alt={member.username}
                                                                         className="member-pfp"
                                                                     />
-                                                                    {editingMemberId === member.id && (
+                                                                    {editingMemberIds.has(memberId) && (
                                                                         <div className="pfp-edit-controls">
                                                                             <input
                                                                                 type="file"
                                                                                 accept="image/*"
-                                                                                onChange={(e) => handleMemberPfpSelect(e, member.id)}
+                                                                                onChange={(e) => handleMemberPfpSelect(e, member.id || member.memberId)}
                                                                                 className="pfp-file-input"
                                                                             />
-                                                                            {memberPfpPreview?.memberId === member.id && memberPfpPreview?.preview && (
+                                                                            {memberPfpPreviews[memberId] && (
                                                                                 <img
-                                                                                    src={memberPfpPreview.preview}
+                                                                                    src={memberPfpPreviews[memberId]}
                                                                                     alt="preview"
                                                                                     className="pfp-preview"
                                                                                 />
@@ -870,29 +1083,43 @@ export default function Admin() {
                                                                 </div>
                                                             </td>
                                                             <td>
-                                                                {editingMemberId === member.id ? (
-                                                                    <input
-                                                                        type="text"
-                                                                        value={memberEditValues.username}
-                                                                        onChange={(e) => setMemberEditValues({ ...memberEditValues, username: e.target.value })}
-                                                                        className="edit-input"
-                                                                    />
-                                                                ) : (
-                                                                    <span
-                                                                        className="editable-field"
-                                                                        onClick={() => startEditingMember(member)}
-                                                                        title="Кликни за редактиране"
-                                                                    >
-                                                                        {member.username}
-                                                                    </span>
-                                                                )}
+                                                                {(() => {
+                                                                    return editingMemberIds.has(memberId) ? (
+                                                                        <input
+                                                                            type="text"
+                                                                            value={memberEditValues[memberId]?.username || ""}
+                                                                            onChange={(e) => setMemberEditValues(prev => ({
+                                                                                ...prev,
+                                                                                [memberId]: {
+                                                                                    ...prev[memberId],
+                                                                                    username: e.target.value
+                                                                                }
+                                                                            }))}
+                                                                            className="edit-input"
+                                                                        />
+                                                                    ) : (
+                                                                        <span
+                                                                            className="editable-field"
+                                                                            onClick={() => startEditingMember(member)}
+                                                                            title="Кликни за редактиране"
+                                                                        >
+                                                                            {member.username}
+                                                                        </span>
+                                                                    );
+                                                                })()}
                                                             </td>
                                                             <td>
-                                                                {editingMemberId === member.id ? (
+                                                                {editingMemberIds.has(memberId) ? (
                                                                     <input
                                                                         type="email"
-                                                                        value={memberEditValues.email}
-                                                                        onChange={(e) => setMemberEditValues({ ...memberEditValues, email: e.target.value })}
+                                                                        value={memberEditValues[memberId]?.email || ""}
+                                                                        onChange={(e) => setMemberEditValues(prev => ({
+                                                                            ...prev,
+                                                                            [memberId]: {
+                                                                                ...prev[memberId],
+                                                                                email: e.target.value
+                                                                            }
+                                                                        }))}
                                                                         className="edit-input"
                                                                     />
                                                                 ) : (
@@ -906,10 +1133,16 @@ export default function Admin() {
                                                                 )}
                                                             </td>
                                                             <td>
-                                                                {editingMemberId === member.id ? (
+                                                                {editingMemberIds.has(memberId) ? (
                                                                     <select
-                                                                        value={memberEditValues.role}
-                                                                        onChange={(e) => setMemberEditValues({ ...memberEditValues, role: e.target.value })}
+                                                                        value={memberEditValues[memberId]?.role || "USER"}
+                                                                        onChange={(e) => setMemberEditValues(prev => ({
+                                                                            ...prev,
+                                                                            [memberId]: {
+                                                                                ...prev[memberId],
+                                                                                role: e.target.value
+                                                                            }
+                                                                        }))}
                                                                         className="edit-input"
                                                                     >
                                                                         <option value="USER">USER</option>
@@ -928,10 +1161,16 @@ export default function Admin() {
                                                                 )}
                                                             </td>
                                                             <td>
-                                                                {editingMemberId === member.id ? (
+                                                                {editingMemberIds.has(memberId) ? (
                                                                     <select
-                                                                        value={memberEditValues.active ? "true" : "false"}
-                                                                        onChange={(e) => setMemberEditValues({ ...memberEditValues, active: e.target.value === "true" })}
+                                                                        value={memberEditValues[memberId]?.active ? "true" : "false"}
+                                                                        onChange={(e) => setMemberEditValues(prev => ({
+                                                                            ...prev,
+                                                                            [memberId]: {
+                                                                                ...prev[memberId],
+                                                                                active: e.target.value === "true"
+                                                                            }
+                                                                        }))}
                                                                         className="edit-input"
                                                                     >
                                                                         <option value="true">Активен</option>
@@ -951,50 +1190,68 @@ export default function Admin() {
                                                             </td>
                                                             <td>{formatDate(member.registeredOn)}</td>
                                                         </tr>
-                                                        {editingMemberId === member.id && (
-                                                            <tr className="row-submit-row">
-                                                                <td colSpan="7">
-                                                                    <div className="row-submit-controls">
-                                                                        <div className="row-submit-buttons">
-                                                                            <button
-                                                                                className="edit-submit-btn"
-                                                                                onClick={() => {
-                                                                                    console.log("Saving member row, member.id:", member.id, "member:", member);
-                                                                                    if (!member.id) {
-                                                                                        setMemberError("Грешка: Липсва ID на член в данните");
-                                                                                        return;
-                                                                                    }
-                                                                                    saveMemberRow(member.id);
-                                                                                }}
-                                                                                disabled={memberPfpUploading === member.id}
-                                                                            >
-                                                                                {memberPfpUploading === member.id ? "Запазване..." : "Направи промяната"}
-                                                                            </button>
-                                                                            <button
-                                                                                className="edit-cancel-btn"
-                                                                                onClick={cancelEditingMember}
-                                                                            >
-                                                                                Отказ
-                                                                            </button>
+                                                        {(() => {
+                                                            const memberId = (member.id || member.memberId || member.uuid || member.userId)?.toString();
+                                                            return editingMemberIds.has(memberId) && (
+                                                                <tr className="row-submit-row">
+                                                                    <td colSpan="7">
+                                                                        <div className="row-submit-controls">
+                                                                            <div className="row-submit-buttons">
+                                                                                <button
+                                                                                    className="edit-submit-btn"
+                                                                                    onClick={() => {
+                                                                                        const id = member.id || member.memberId;
+                                                                                        console.log("Saving member row, member.id:", id, "member:", member);
+                                                                                        if (!id) {
+                                                                                            setMemberErrors(prev => ({
+                                                                                                ...prev,
+                                                                                                [memberId || 'unknown']: "Грешка: Липсва ID на член в данните"
+                                                                                            }));
+                                                                                            return;
+                                                                                        }
+                                                                                        saveMemberRow(id);
+                                                                                    }}
+                                                                                    disabled={memberPfpUploading === memberId || memberSaving === memberId}
+                                                                                >
+                                                                                    {memberSaving === memberId ? (
+                                                                                        <span className="saving-indicator">
+                                                                                            <span className="spinner-small"></span>
+                                                                                            Обработка на заявка...
+                                                                                        </span>
+                                                                                    ) : memberPfpUploading === memberId ? (
+                                                                                        "Запазване..."
+                                                                                    ) : (
+                                                                                        "Направи промяната"
+                                                                                    )}
+                                                                                </button>
+                                                                                <button
+                                                                                    className="edit-cancel-btn"
+                                                                                    onClick={() => cancelEditingMember(member.id || member.memberId)}
+                                                                                >
+                                                                                    Отказ
+                                                                                </button>
+                                                                            </div>
+                                                                            {memberErrors[memberId] && (
+                                                                                <div className="admin-error-message">
+                                                                                    <span className="error-icon">⚠️</span>
+                                                                                    <span>{memberErrors[memberId]}</span>
+                                                                                </div>
+                                                                            )}
+                                                                            {memberPfpErrors[memberId] && (
+                                                                                <div className="admin-error-message">
+                                                                                    <span className="error-icon">⚠️</span>
+                                                                                    <span>{memberPfpErrors[memberId]}</span>
+                                                                                </div>
+                                                                            )}
                                                                         </div>
-                                                                        {memberError && (
-                                                                            <div className="admin-error-message">
-                                                                                <span className="error-icon">⚠️</span>
-                                                                                <span>{memberError}</span>
-                                                                            </div>
-                                                                        )}
-                                                                        {memberPfpError && (
-                                                                            <div className="admin-error-message">
-                                                                                <span className="error-icon">⚠️</span>
-                                                                                <span>{memberPfpError}</span>
-                                                                            </div>
-                                                                        )}
-                                                                    </div>
-                                                                </td>
-                                                            </tr>
-                                                        )}
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })()}
                                                     </React.Fragment>
-                                                ))
+                                                    );
+                                                })
+                                                .filter(item => item !== null)
                                             )}
                                         </tbody>
                                     </table>
@@ -1158,9 +1415,16 @@ export default function Admin() {
                                                                             <button
                                                                                 className="edit-submit-btn"
                                                                                 onClick={() => saveCommentChanges(comment.id)}
-                                                                                disabled={!commentEditValue.trim()}
+                                                                                disabled={!commentEditValue.trim() || commentSaving === comment.id?.toString()}
                                                                             >
-                                                                                Направи промяната
+                                                                                {commentSaving === comment.id?.toString() ? (
+                                                                                    <span className="saving-indicator">
+                                                                                        <span className="spinner-small"></span>
+                                                                                        Обработка на заявка...
+                                                                                    </span>
+                                                                                ) : (
+                                                                                    "Направи промяната"
+                                                                                )}
                                                                             </button>
                                                                             <button
                                                                                 className="edit-cancel-btn"

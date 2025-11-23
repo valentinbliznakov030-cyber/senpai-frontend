@@ -7,7 +7,35 @@ import { redirectToServerDown } from "../utils/serverDownRedirect";
 
 async function safeFetch(url, options = {}) {
     try {
-        const res = await fetch(url, options);
+        const token = localStorage.getItem("jwtToken");
+        
+        // Don't add Authorization header for external APIs (HiAnime, Consumet)
+        // as they don't expect/accept JWT tokens
+        // Only add Authorization header for our backend API (localhost:8080)
+        const isExternalApi = url.includes('localhost:3030') || url.includes('localhost:3000');
+        
+        const headers = {
+            ...(options.headers || {}),
+            // Only add Authorization header for our backend API
+            ...(token && !isExternalApi ? { Authorization: `Bearer ${token}` } : {}),
+        };
+
+        const res = await fetch(url, {
+            ...options,
+            headers,
+        });
+        
+        // Check for 500 status - server error
+        if (res.status === 500) {
+            redirectToServerDown();
+            return {
+                ok: false,
+                data: null,
+                status: 500,
+                networkError: false,
+            };
+        }
+        
         const data = res.ok ? await res.json() : null;
 
         return {
@@ -74,6 +102,14 @@ export default function Watch() {
     const [openMenuId, setOpenMenuId] = useState(null);
     const [editingId, setEditingId] = useState(null);
     const [editContent, setEditContent] = useState("");
+    
+    // COMMENT ERRORS
+    const [commentError, setCommentError] = useState(null);
+    const [commentLoading, setCommentLoading] = useState(false);
+    
+    // ANIME/EPISODE LOADING ERRORS
+    const [animeEpisodeError, setAnimeEpisodeError] = useState(null);
+    const [animeEpisodeLoading, setAnimeEpisodeLoading] = useState(true);
 
 
 
@@ -180,7 +216,10 @@ export default function Watch() {
             sessionStorage.setItem(cacheKey, JSON.stringify(result.data));
         }
 
-        loadEpisodes();
+        loadEpisodes().catch((error) => {
+            console.error("Error loading episodes:", error);
+            triggerVideoError("❌ Грешка при зареждане на епизодите.");
+        });
     }, [consumetAnimeId]);
 
     /* ============================
@@ -194,8 +233,12 @@ export default function Watch() {
             if (!animeTitle || !episodeNumber || episodes.length === 0) {
                 setAnimeBackendId(null);
                 setEpisodeBackendId(null);
+                setAnimeEpisodeLoading(true);
                 return;
             }
+            
+            setAnimeEpisodeLoading(true);
+            setAnimeEpisodeError(null);
 
             const selected = episodes[episodeNumber - 1];
             if (!selected || !selected.url) {
@@ -216,8 +259,22 @@ export default function Watch() {
                     body: JSON.stringify(animeRequestBody),
                 });
 
-                if (resA.networkError || !resA.ok) {
-                    console.error("Failed to create/get anime early");
+                if (resA.networkError) {
+                    setAnimeEpisodeError("🔌 Няма връзка със сървъра. Моля, опитайте отново по-късно.");
+                    setAnimeEpisodeLoading(false);
+                    return;
+                }
+
+                if (resA.status === 500) {
+                    // Will redirect to /500 via safeFetch
+                    setAnimeEpisodeLoading(false);
+                    return;
+                }
+
+                if (!resA.ok) {
+                    const errorMsg = resA.data?.message || `Грешка при зареждане на анимето (${resA.status})`;
+                    setAnimeEpisodeError(`❌ ${errorMsg}. Моля, опитайте отново по-късно.`);
+                    setAnimeEpisodeLoading(false);
                     return;
                 }
 
@@ -235,8 +292,22 @@ export default function Watch() {
                     }),
                 });
 
-                if (resB.networkError || !resB.ok) {
-                    console.error("Failed to create/get episode early");
+                if (resB.networkError) {
+                    setAnimeEpisodeError("🔌 Няма връзка със сървъра. Моля, опитайте отново по-късно.");
+                    setAnimeEpisodeLoading(false);
+                    return;
+                }
+
+                if (resB.status === 500) {
+                    // Will redirect to /500 via safeFetch
+                    setAnimeEpisodeLoading(false);
+                    return;
+                }
+
+                if (!resB.ok) {
+                    const errorMsg = resB.data?.message || `Грешка при зареждане на епизода (${resB.status})`;
+                    setAnimeEpisodeError(`❌ ${errorMsg}. Моля, опитайте отново по-късно.`);
+                    setAnimeEpisodeLoading(false);
                     return;
                 }
 
@@ -250,13 +321,21 @@ export default function Watch() {
                 if (episodeBackend.m3u8Link) {
                     setM3u8Link(episodeBackend.m3u8Link);
                 }
+                
+                // Clear error on success
+                setAnimeEpisodeError(null);
+                setAnimeEpisodeLoading(false);
             } catch (err) {
                 console.error("Failed to create/get anime/episode early:", err);
-                // Don't set error - video loading will handle it
+                setAnimeEpisodeError("❌ Неочаквана грешка при зареждане на данните. Моля, опитайте отново по-късно.");
+                setAnimeEpisodeLoading(false);
             }
         }
 
-        createOrGetAnimeAndEpisode();
+        createOrGetAnimeAndEpisode().catch((error) => {
+            console.error("Error creating/getting anime and episode:", error);
+            setAnimeEpisodeLoading(false);
+        });
     }, [animeTitle, hiAnimeId, episodeNumber, episodes]);
 
     /* ============================
@@ -344,7 +423,11 @@ export default function Watch() {
             }
         }
 
-        loadVideo();
+        loadVideo().catch((error) => {
+            console.error("Error loading video:", error);
+            setVideoError("❌ Грешка при зареждане на видеото.");
+            setVideoLoading(false);
+        });
     }, [isPlaying, episodes, episodeNumber, animeBackendId, episodeBackendId, killSession, isLoggedIn]);
 
     useEffect(() => {
@@ -357,36 +440,78 @@ export default function Watch() {
     setCurrentUser(null);
 }, [episodeNumber]);
 
-    useEffect(() => {
     async function loadComments() {
-        if (!episodeBackendId) return;   // <--- ВАЖНО!
+        if (!episodeBackendId) return;
 
+        setCommentError(null);
         const result = await safeFetch(
             `http://localhost:8080/api/v1/comments?episodeId=${episodeBackendId}&page=${page}&size=15`
         );
 
-        if (!result.ok || result.networkError) return;
+        if (result.networkError) {
+            setCommentError("🔌 Няма връзка със сървъра. Моля, опитайте отново.");
+            return;
+        }
+
+        if (!result.ok) {
+            const errorMsg = result.data?.message || `Грешка при зареждане на коментарите (${result.status})`;
+            setCommentError(`❌ ${errorMsg}`);
+            return;
+        }
 
         const data = result.data;
         setCommentsData(data);
 
-        // Save user (from first response or use authUser) - only on first load
-        if (page === 0 && data.userLogged && !currentUser) {
-            const myUser = data.comments.find(c => c.commentCreator)?.commentCreator;
-            if (myUser) {
-                setCurrentUser(myUser);
-            } else if (authUser) {
-                // Fallback to authUser if not found in comments
+        // Determine current user for splitting comments
+        let me = null;
+        
+        if (data.userLogged) {
+            // Strategy 1: Use authUser first (most reliable - comes from AuthContext)
+            // Strategy 2: Use currentUser if authUser not available yet
+            // Strategy 3: Find user from comments that matches authUser (fallback)
+            const userToUse = authUser || currentUser;
+            
+            if (userToUse) {
+                me = userToUse.username;
+            } else {
+                // Last resort: find user from comments, but only if we can match it with authUser later
+                const myUserFromComments = data.comments.find(c => c.commentCreator)?.commentCreator;
+                if (myUserFromComments) {
+                    me = myUserFromComments.username;
+                    setCurrentUser(myUserFromComments);
+                }
+            }
+            
+            // Update currentUser if we have authUser but not currentUser
+            if (page === 0 && authUser && !currentUser) {
                 setCurrentUser(authUser);
             }
+            
+            // Debug logging
+            console.log("🔍 Comment splitting debug:", {
+                userLogged: data.userLogged,
+                authUser: authUser?.username,
+                currentUser: currentUser?.username,
+                me: me,
+                comments: data.comments.map(c => ({
+                    id: c.id,
+                    creator: c.commentCreator?.username,
+                    isMine: c.commentCreator?.username?.toLowerCase() === me?.toLowerCase()
+                }))
+            });
         }
 
-        // Use currentUser or authUser for splitting
-        const userToUse = currentUser || authUser;
-        const me = data.userLogged ? (userToUse?.username) : null;
-
-        const my = data.comments.filter(c => c.commentCreator?.username === me);
-        const others = data.comments.filter(c => c.commentCreator?.username !== me);
+        // Case-insensitive comparison for username matching
+        const my = data.comments.filter(c => {
+            const commentUsername = c.commentCreator?.username?.toLowerCase();
+            const myUsername = me?.toLowerCase();
+            return commentUsername === myUsername;
+        });
+        const others = data.comments.filter(c => {
+            const commentUsername = c.commentCreator?.username?.toLowerCase();
+            const myUsername = me?.toLowerCase();
+            return commentUsername !== myUsername;
+        });
 
         if (page === 0) {
             // First page - replace all
@@ -401,8 +526,12 @@ export default function Watch() {
         }
     }
 
-    loadComments();
-}, [episodeBackendId, page, authUser]);
+    useEffect(() => {
+        loadComments().catch((error) => {
+            console.error("Error loading comments:", error);
+            setCommentError("❌ Неочаквана грешка при зареждане на коментарите.");
+        });
+    }, [episodeBackendId, page, authUser, isLoggedIn]);
 
 function loadMoreComments() {
     setPage((p) => p + 1);
@@ -453,60 +582,57 @@ function loadMoreComments() {
             }
         }
 
-        loadFavoriteStatus();
+        loadFavoriteStatus().catch((error) => {
+            console.error("Error loading favorite status:", error);
+            setIsFavorite(false);
+            setFavoriteId(null);
+        });
     }, [isLoggedIn, animeBackendId, animeTitle]);
 
 async function handleAddComment() {
     if (!newComment.trim()) return;
     
     if (!episodeBackendId) {
-        alert("Моля, заредете епизод първо, за да добавите коментар.");
+        setCommentError("⚠️ Моля, заредете епизод първо, за да добавите коментар.");
         return;
     }
 
-    const body = {
-        episodeId: episodeBackendId,
-        content: newComment.trim()
-    };
+    setCommentError(null);
+    setCommentLoading(true);
 
-    const res = await authFetch("http://localhost:8080/api/v1/comments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
+    try {
+        const body = {
+            episodeId: episodeBackendId,
+            content: newComment.trim()
+        };
 
-    if (!res.ok) {
-        console.error("Failed to add comment");
-        return;
-    }
+        const res = await authFetch("http://localhost:8080/api/v1/comments", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
 
-    const data = await res.json();
-
-    // Use currentUser or authUser as fallback
-    const userForComment = currentUser || authUser;
-    
-    if (!userForComment) {
-        console.error("No user data available");
-        return;
-    }
-
-    const newC = {
-        id: data.commentId,
-        content: data.content,
-        commentCreator: {
-            username: userForComment.username,
-            // Add other user properties if needed
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMsg = errorData.message || `Грешка при добавяне на коментар (${res.status})`;
+            setCommentError(`❌ ${errorMsg}`);
+            setCommentLoading(false);
+            return;
         }
-    };
 
-    // Add to my comments and update state
-    setMyComments((prev) => [newC, ...prev]);
-    setNewComment("");
-    setIsWriting(false);
-    
-    // Update currentUser if not set
-    if (!currentUser && userForComment) {
-        setCurrentUser(userForComment);
+        const data = await res.json();
+
+        // Clear comment input
+        setNewComment("");
+        setIsWriting(false);
+        
+        // Reload comments to get fresh data from server (including user info)
+        await loadComments();
+    } catch (error) {
+        console.error("Error adding comment:", error);
+        setCommentError("❌ Неочаквана грешка при добавяне на коментар.");
+    } finally {
+        setCommentLoading(false);
     }
 }
 
@@ -525,27 +651,76 @@ function cancelEditing() {
     setEditContent("");
 }
 async function handleUpdateComment() {
-    const body = {
-        commentId: editingId,
-        content: editContent
-    };
+    if (!editingId || !editContent.trim()) return;
 
-    const res = await authFetch("http://localhost:8080/api/v1/comments", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-    });
+    setCommentError(null);
+    setCommentLoading(true);
 
-    if (!res.ok) return;
+    try {
+        const body = {
+            commentId: editingId,
+            newContent: editContent.trim()
+        };
 
-    // update locally
-    setMyComments(prev =>
-        prev.map(c =>
-            c.id === editingId ? { ...c, content: editContent } : c
-        )
-    );
+        const res = await authFetch("http://localhost:8080/api/v1/comments", {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body)
+        });
 
-    cancelEditing();
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMsg = errorData.message || `Грешка при обновяване на коментар (${res.status})`;
+            setCommentError(`❌ ${errorMsg}`);
+            setCommentLoading(false);
+            return;
+        }
+
+        // Update locally
+        setMyComments(prev =>
+            prev.map(c =>
+                c.id === editingId ? { ...c, content: editContent.trim() } : c
+            )
+        );
+
+        cancelEditing();
+    } catch (error) {
+        console.error("Error updating comment:", error);
+        setCommentError("❌ Неочаквана грешка при обновяване на коментар.");
+    } finally {
+        setCommentLoading(false);
+    }
+}
+
+async function handleDeleteComment(commentId) {
+    if (!commentId) return;
+
+    setCommentError(null);
+    setCommentLoading(true);
+
+    try {
+        const res = await authFetch(`http://localhost:8080/api/v1/comments/${commentId}`, {
+            method: "DELETE"
+        });
+
+        if (!res.ok) {
+            const errorData = await res.json().catch(() => ({}));
+            const errorMsg = errorData.message || `Грешка при изтриване на коментар (${res.status})`;
+            setCommentError(`❌ ${errorMsg}`);
+            setCommentLoading(false);
+            return;
+        }
+
+        // Remove from local state
+        setMyComments(prev => prev.filter(c => c.id !== commentId));
+        setComments(prev => prev.filter(c => c.id !== commentId));
+        setOpenMenuId(null);
+    } catch (error) {
+        console.error("Error deleting comment:", error);
+        setCommentError("❌ Неочаквана грешка при изтриване на коментар.");
+    } finally {
+        setCommentLoading(false);
+    }
 }
 async function handleDeleteComment(id) {
     const res = await authFetch(`http://localhost:8080/api/v1/comments/${id}`, {
@@ -811,6 +986,19 @@ async function handleDeleteComment(id) {
 
     return (
     <div className="watch-page">
+        {/* Anime/Episode Loading Error */}
+        {animeEpisodeError && (
+            <div className="anime-episode-error-box">
+                <span className="anime-episode-error-close" onClick={() => setAnimeEpisodeError(null)}>×</span>
+                <div className="anime-episode-error-content">
+                    <h4>⚠️ Проблем при зареждане на данните</h4>
+                    <p>{animeEpisodeError}</p>
+                    <p className="anime-episode-error-note">
+                        Без тези данни няма да можете да коментирате или да използвате други функции.
+                    </p>
+                </div>
+            </div>
+        )}
 
         <div className="top-row">
             <div className="video-container">
@@ -822,9 +1010,22 @@ async function handleDeleteComment(id) {
                             <button
                                 className="hsr-btn play-btn"
                                 onClick={() => setIsPlaying(true)}
+                                disabled={animeEpisodeLoading}
                             >
                                 <span className="play-icon">▶</span>
                             </button>
+                        </div>
+                    )}
+                    
+                    {/* Loading overlay while anime/episode data is loading */}
+                    {animeEpisodeLoading && (
+                        <div className="data-loading-overlay">
+                            <div className="data-loading-content">
+                                <div className="data-loading-spinner"></div>
+                                <h3>Зареждане на данни...</h3>
+                                <p>Моля, изчакайте докато се заредят данните за анимето и епизода.</p>
+                                <p className="data-loading-note">Това е необходимо, за да можете да коментирате и да използвате други функции.</p>
+                            </div>
                         </div>
                     )}
 
@@ -917,7 +1118,7 @@ async function handleDeleteComment(id) {
                             ) : (
                                 <button
                                     className={`favorite-btn ${isFavorite ? "active" : ""}`}
-                                    disabled={favoriteLoading || !animeBackendId}
+                                    disabled={favoriteLoading || !animeBackendId || animeEpisodeLoading}
                                     onClick={handleToggleFavorite}
                                 >
                                     <span className="favorite-icon">
@@ -971,6 +1172,14 @@ async function handleDeleteComment(id) {
         <div className="comments-wrapper">
             <h3 className="comments-title">Коментари</h3>
 
+            {/* Comment Error Display */}
+            {commentError && (
+                <div className="comment-error-box">
+                    <span className="comment-error-close" onClick={() => setCommentError(null)}>×</span>
+                    <p>{commentError}</p>
+                </div>
+            )}
+
             {/* Add comment box - Only for logged in users */}
             {isLoggedIn ? (
                 <div className="comment-add-box">
@@ -981,20 +1190,23 @@ async function handleDeleteComment(id) {
                     <div className="comment-input-wrapper">
                         <input
                             className="comment-input"
-                            placeholder={episodeBackendId ? "Добавете коментар…" : "Заредете епизод, за да коментирате…"}
+                            placeholder={animeEpisodeLoading ? "Зареждане на данни..." : (episodeBackendId ? "Добавете коментар…" : "Заредете епизод, за да коментирате…")}
                             value={newComment}
                             onChange={(e) => setNewComment(e.target.value)}
                             onFocus={() => {
+                                if (animeEpisodeLoading) {
+                                    return;
+                                }
                                 if (episodeBackendId) {
                                     setIsWriting(true);
                                 } else {
                                     alert("Моля, заредете епизод първо, за да коментирате.");
                                 }
                             }}
-                            disabled={!episodeBackendId}
+                            disabled={!episodeBackendId || animeEpisodeLoading}
                             style={{
-                                opacity: episodeBackendId ? 1 : 0.6,
-                                cursor: episodeBackendId ? "text" : "not-allowed"
+                                opacity: (episodeBackendId && !animeEpisodeLoading) ? 1 : 0.6,
+                                cursor: (episodeBackendId && !animeEpisodeLoading) ? "text" : "not-allowed"
                             }}
                         />
 
@@ -1005,15 +1217,16 @@ async function handleDeleteComment(id) {
                                         setNewComment("");
                                         setIsWriting(false);
                                     }}
+                                    disabled={commentLoading}
                                 >
                                     Отказ
                                 </button>
 
                                 <button
-                                    disabled={newComment.trim().length === 0}
+                                    disabled={newComment.trim().length === 0 || commentLoading}
                                     onClick={handleAddComment}
                                 >
-                                    Коментар
+                                    {commentLoading ? "Зареждане..." : "Коментар"}
                                 </button>
                             </div>
                         )}
@@ -1086,16 +1299,19 @@ async function handleDeleteComment(id) {
                                         />
 
                                         <div className="edit-controls">
-                                            <button onClick={cancelEditing}>
+                                            <button 
+                                                onClick={cancelEditing}
+                                                disabled={commentLoading}
+                                            >
                                                 Отказ
                                             </button>
                                             <button
                                                 disabled={
-                                                    editContent.trim().length === 0
+                                                    editContent.trim().length === 0 || commentLoading
                                                 }
                                                 onClick={handleUpdateComment}
                                             >
-                                                Ъпдейт
+                                                {commentLoading ? "Зареждане..." : "Ъпдейт"}
                                             </button>
                                         </div>
                                     </div>
@@ -1143,21 +1359,24 @@ async function handleDeleteComment(id) {
             )}
 
             {/* Loading state - comments not loaded yet */}
-            {!commentsData && episodeBackendId && (
+            {!commentsData && episodeBackendId && !animeEpisodeLoading && (
                 <div className="comments-loading">
                     <p>Зареждане на коментари...</p>
                 </div>
             )}
 
-            {/* No episode loaded state */}
-            {!episodeBackendId && (
-                <div className="comments-empty">
-                    <p>Заредете епизод, за да видите коментари.</p>
+            {/* Loading state - anime/episode data loading */}
+            {animeEpisodeLoading && (
+                <div className="comments-data-loading">
+                    <div className="comments-data-loading-spinner"></div>
+                    <h4>Зареждане на данни...</h4>
+                    <p>Моля, изчакайте докато се заредят данните за анимето и епизода.</p>
+                    <p className="comments-data-loading-note">Това е необходимо, за да можете да коментирате и да използвате други функции.</p>
                 </div>
             )}
 
-            {/* Show message if no episode loaded yet */}
-            {!episodeBackendId && (
+            {/* No episode loaded state - only show if not loading */}
+            {!episodeBackendId && !animeEpisodeLoading && (
                 <div className="comments-empty">
                     <p>Заредете епизод, за да видите коментари.</p>
                 </div>

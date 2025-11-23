@@ -51,6 +51,16 @@ const Profile = () => {
   const [pfpFile, setPfpFile] = useState(null);
   const [pfpPreview, setPfpPreview] = useState(null);
   const [pfpMessage, setPfpMessage] = useState("");
+  
+  // History menu state
+  const [openHistoryMenuId, setOpenHistoryMenuId] = useState(null);
+  const [historyError, setHistoryError] = useState(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  
+  // Favorites menu state
+  const [openFavoritesMenuId, setOpenFavoritesMenuId] = useState(null);
+  const [favoritesError, setFavoritesError] = useState(null);
+  const [favoritesLoading, setFavoritesLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -61,6 +71,8 @@ const Profile = () => {
 
         setUser(data);
         setAuthUser(data);
+        // Update localStorage to keep it in sync
+        localStorage.setItem("user", JSON.stringify(data));
 
         setEditForm({
           username: data.username,
@@ -157,6 +169,80 @@ const Profile = () => {
     loadHistory();
   }, []);
 
+  const toggleHistoryMenu = (id) => {
+    setOpenHistoryMenuId(prev => prev === id ? null : id);
+  };
+
+  const handleDeleteHistory = async (historyId) => {
+    if (!historyId) return;
+
+    setHistoryError(null);
+    setHistoryLoading(true);
+    setOpenHistoryMenuId(null);
+
+    try {
+      const resp = await authFetch(
+        `http://localhost:8080/api/v1/history/${historyId}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        const errorMsg = errorData.message || `Грешка при изтриване на запис (${resp.status})`;
+        setHistoryError(`❌ ${errorMsg}`);
+        setHistoryLoading(false);
+        return;
+      }
+
+      // Remove from local state
+      setHistory(prev => prev.filter(h => h.id !== historyId));
+    } catch (error) {
+      console.error("Error deleting history entry:", error);
+      setHistoryError("❌ Неочаквана грешка при изтриване на запис.");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
+
+  const toggleFavoritesMenu = (id) => {
+    setOpenFavoritesMenuId(prev => prev === id ? null : id);
+  };
+
+  const handleDeleteFavorite = async (favoriteId) => {
+    if (!favoriteId) return;
+
+    setFavoritesError(null);
+    setFavoritesLoading(true);
+    setOpenFavoritesMenuId(null);
+
+    try {
+      const resp = await authFetch(
+        `http://localhost:8080/api/v1/favourite/${favoriteId}`,
+        {
+          method: "DELETE"
+        }
+      );
+
+      if (!resp.ok) {
+        const errorData = await resp.json().catch(() => ({}));
+        const errorMsg = errorData.message || `Грешка при изтриване на любимо (${resp.status})`;
+        setFavoritesError(`❌ ${errorMsg}`);
+        setFavoritesLoading(false);
+        return;
+      }
+
+      // Remove from local state
+      setFavorites(prev => prev.filter(f => f.id !== favoriteId));
+    } catch (error) {
+      console.error("Error deleting favorite:", error);
+      setFavoritesError("❌ Неочаквана грешка при изтриване на любимо.");
+    } finally {
+      setFavoritesLoading(false);
+    }
+  };
+
   const handleEditChange = (e) => {
     setEditForm({ ...editForm, [e.target.name]: e.target.value });
   };
@@ -231,6 +317,8 @@ const Profile = () => {
       const updated = { ...user, profilePictureUrl: url };
       setUser(updated);
       setAuthUser(updated);
+      // Update localStorage to keep it in sync
+      localStorage.setItem("user", JSON.stringify(updated));
     } else {
       setPfpMessage("❌ Грешка при качване.");
     }
@@ -353,14 +441,22 @@ const Profile = () => {
         </div>
       )}
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
-        <h2 className="profile-section-title" style={{ margin: 0 }}>Любими анимета</h2>
+      <div className="profile-section-header">
+        <h2 className="profile-section-title">Любими анимета</h2>
         {favorites.length > 0 && (
-          <a href="/favourites" className="btn btn-outline" style={{ textDecoration: "none" }}>
+          <a href="/favourites" className="profile-section-link">
             Виж всички
           </a>
         )}
       </div>
+
+      {/* Favorites Error Display */}
+      {favoritesError && (
+        <div className="history-error-box">
+          <span className="history-error-close" onClick={() => setFavoritesError(null)}>×</span>
+          <p>{favoritesError}</p>
+        </div>
+      )}
 
       <div id="anime-grid">
         {loadingFav ? (
@@ -379,7 +475,28 @@ const Profile = () => {
                   <img src={fav.poster} alt={fav.title} loading="lazy" />
                 </div>
                 <div className="anime-content">
-                  <h3 className="anime-title">{fav.title}</h3>
+                  <div className="anime-card-header">
+                    <h3 className="anime-title">{fav.title}</h3>
+                    <span
+                      className="history-menu-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleFavoritesMenu(fav.id);
+                      }}
+                    >
+                      ⋮
+                    </span>
+                    {openFavoritesMenuId === fav.id && (
+                      <div
+                        className="history-menu"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div onClick={() => handleDeleteFavorite(fav.id)}>
+                          Изтриване
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div className="anime-details">
                     {fav.duration && (
                       <span className="anime-detail anime-duration">
@@ -404,14 +521,22 @@ const Profile = () => {
         )}
       </div>
 
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px", marginTop: "40px" }}>
-        <h2 className="profile-section-title" style={{ margin: 0 }}>Последно гледани</h2>
+      <div className="profile-section-header">
+        <h2 className="profile-section-title">Последно гледани</h2>
         {history.length > 0 && (
-          <a href="/watch-history" className="btn btn-outline" style={{ textDecoration: "none" }}>
+          <a href="/watch-history" className="profile-section-link">
             Виж всички
           </a>
         )}
       </div>
+
+      {/* History Error Display */}
+      {historyError && (
+        <div className="history-error-box">
+          <span className="history-error-close" onClick={() => setHistoryError(null)}>×</span>
+          <p>{historyError}</p>
+        </div>
+      )}
 
       <div id="anime-grid">
         {loadingHistory ? (
@@ -430,7 +555,28 @@ const Profile = () => {
                   <img src={h.poster} alt={h.title} loading="lazy" />
                 </div>
                 <div className="anime-content">
-                  <h3 className="anime-title">{h.title}</h3>
+                  <div className="anime-card-header">
+                    <h3 className="anime-title">{h.title}</h3>
+                    <span
+                      className="history-menu-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleHistoryMenu(h.id);
+                      }}
+                    >
+                      ⋮
+                    </span>
+                    {openHistoryMenuId === h.id && (
+                      <div
+                        className="history-menu"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <div onClick={() => handleDeleteHistory(h.id)}>
+                          Изтриване
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <div className="anime-details">
                     {h.duration && (
                       <span className="anime-detail anime-duration">

@@ -20,7 +20,7 @@ export default function Plans() {
 
             try {
                 const resp = await authFetch(
-                    `http://localhost:8080/api/v1/subscriptions/${user.id}`
+                    `http://localhost:8080/api/v1/subscriptions`
                 );
 
                 if (resp.ok) {
